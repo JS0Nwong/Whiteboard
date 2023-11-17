@@ -26,11 +26,10 @@ export default function BoardListView() {
                 m: { xs: 1, md: 0 },
                 height: "100%",
                 flexWrap: 'wrap'
-
             }}>
                 <CreateBoard />
                 {boards.map((board, index) => (
-                    <BoardListCard data={board} key={board.id} />
+                    <BoardListCard data={board} key={board.id} id={board.id}/>
                 ))}
             </Box>
         </>

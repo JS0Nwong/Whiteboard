@@ -18,14 +18,28 @@ import {
 } from '@mui/material'
 import { Cross1Icon } from '@radix-ui/react-icons'
 
-export default function AddTaskForm({ open, onClose, handleAddTask, columnName }) {
+export default function AddTaskForm({ 
+  open, 
+  onClose, 
+  handleAddTask, 
+  columnName, 
+  mode,
+  currentTask,
+  handleTaskUpdate
+}) {
   const [task, setTask] = useState('')
   const [description, setDescription] = useState('')
 
   const handleSubmit = () => {
-    if(!task.trim()) alert('name cannot be empty')
-    handleAddTask(task, description, columnName) 
-    onClose()
+    if(mode === "edit") { 
+      handleTaskUpdate(task, currentTask, description, columnName)
+      onClose()
+    }
+    else {
+      if(!task.trim()) alert('name cannot be empty')
+      handleAddTask(task, description, columnName) 
+      onClose()
+    }
   }
 
   return (
@@ -47,7 +61,7 @@ export default function AddTaskForm({ open, onClose, handleAddTask, columnName }
             fontWeight: "500",
             fontSize: "1rem"
           }}>
-            New Item for {columnName}
+            {mode === 'edit' ? `Edit Item for ${columnName}` : `New Item for ${columnName}`}
           </DialogTitle>
 
           <IconButton
@@ -90,7 +104,7 @@ export default function AddTaskForm({ open, onClose, handleAddTask, columnName }
                     mt: 1,
                   }}>Item: </FormLabel>
                   <Input
-                    placeholder="Task"
+                    placeholder={currentTask !== undefined ? currentTask : "Task"}
                     disableUnderline
                     sx={{
                       color: "#FFFFFF",
@@ -150,7 +164,7 @@ export default function AddTaskForm({ open, onClose, handleAddTask, columnName }
                 }
               }}
             >
-              Add
+              {mode === "edit" ? "Save" : "Add"}
             </Button>
           </DialogActions>
         </DialogContent>

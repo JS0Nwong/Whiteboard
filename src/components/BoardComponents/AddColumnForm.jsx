@@ -25,15 +25,30 @@ const colors = [
   '255, 112, 166',
 ]
 
-export default function AddColumnForm({ open, onClose, addColumn }) {
-  const [columnName, setColumnName] = useState('')
-  const [description, setDescription] = useState('')
-  const [color, setColor] = useState('52, 58, 64')
+export default function AddColumnForm({
+  open,
+  onClose,
+  addColumn,
+  mode,
+  existingColumnName,
+  currentColor,
+  handleColumnUpdate,
+  currentDescription
+}) {
+  const [columnName, setColumnName] = useState(existingColumnName !== undefined ? existingColumnName :'')
+  const [description, setDescription] = useState(currentDescription !== undefined ? currentDescription : '')
+  const [color, setColor] = useState(currentColor !== undefined ? currentColor : '52, 58, 64')
 
   const handleSubmit = () => {
-    if(!columnName.trim()) alert('name cannot be empty')
-    addColumn(columnName, description, color) 
-    onClose()
+    if(mode ==='edit') {
+      handleColumnUpdate(existingColumnName, columnName, description, color)
+      onClose()
+    }
+    else {
+      if(!columnName.trim()) alert('name cannot be empty')
+      addColumn(columnName, description, color) 
+      onClose()
+    }
   }
 
   return (
@@ -51,9 +66,10 @@ export default function AddColumnForm({ open, onClose, addColumn }) {
       <DialogTitle sx={{
         color: 'white',
         fontWeight: "500",
-        fontSize: "1rem"
+        fontSize: "1rem",
+        fontFamily: "Poppins"
       }}>
-        New Column
+        {mode === 'edit' ? 'Edit Column' : 'New Column'}
       </DialogTitle>
 
       <IconButton
@@ -73,7 +89,7 @@ export default function AddColumnForm({ open, onClose, addColumn }) {
         display: 'flex',
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: 'center'
+        justifyContent: 'center',
       }}>
         <Box sx={{
           backgroundColor: `rgba(${color.replace(/['"]+/g, '')}, 0.15)`,
@@ -89,6 +105,7 @@ export default function AddColumnForm({ open, onClose, addColumn }) {
           justifyContent: 'center',
           textOverflow: "ellipsis",
           overflow: 'hidden',
+          
           "&:before": {
             opacity: "0.4"
           }
@@ -113,7 +130,8 @@ export default function AddColumnForm({ open, onClose, addColumn }) {
             <FormControl required>
               <FormLabel sx={{
                 "&.MuiFormLabel-root": {
-                  color: "white"
+                  color: "white",
+                  fontFamily: "Poppins"
                 },
                 ".Mui-focused": {
                   color: "white"
@@ -159,7 +177,8 @@ export default function AddColumnForm({ open, onClose, addColumn }) {
             <FormControl required>
               <FormLabel sx={{
                 "&.MuiFormLabel-root": {
-                  color: "white"
+                  color: "white",
+                  fontFamily: "Poppins"
                 },
                 ".Mui-focused": {
                   color: "white"
@@ -170,7 +189,7 @@ export default function AddColumnForm({ open, onClose, addColumn }) {
                 mt: 1,
               }}>Name: </FormLabel>
               <Input
-                placeholder="Name"
+                placeholder={existingColumnName !== undefined ? existingColumnName :"Name"}
                 disableUnderline
                 sx={{
                   color: "#FFFFFF",
@@ -196,15 +215,16 @@ export default function AddColumnForm({ open, onClose, addColumn }) {
             <FormControl>
               <FormLabel sx={{
                 "&.MuiFormLabel-root": {
-                  color: "white"
+                  color: "white",
+                  fontFamily: "Poppins"
                 },
                 ".Mui-focused": {
                   color: "white"
                 },
                 mt: 1
-              }}>Description </FormLabel >
+              }}>Description: </FormLabel >
               <Input
-                placeholder="Description"
+                placeholder={currentDescription !== undefined ? currentDescription : "Description"}
                 disableUnderline
                 sx={{
                   color: "#FFFFFF",

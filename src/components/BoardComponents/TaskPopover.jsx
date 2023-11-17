@@ -16,7 +16,7 @@ import { Pencil1Icon } from '@radix-ui/react-icons';
 
 import DeleteItem from "./DeleteItem"
 
-export default function TaskPopover({ open, onClose, anchor, number, handleRemoveTask }) {
+export default function TaskPopover({ open, onClose, anchor, number, handleRemoveTask, openEditTask }) {
   const [openDelete, setOpen] = useState(false)
   return (
     <>
@@ -118,6 +118,7 @@ export default function TaskPopover({ open, onClose, anchor, number, handleRemov
                   backgroundColor: "rgba(115, 115, 115, 0.2)"
                 }
               }}
+              onClick={() => openEditTask()}
             >
               Edit Details
             </Button>

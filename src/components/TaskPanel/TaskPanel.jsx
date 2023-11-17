@@ -1,0 +1,150 @@
+import {useEffect, useState} from 'react'
+import {
+    Drawer,
+    Box,
+    Typography,
+    Divider,
+    IconButton,
+    Button
+} from "@mui/material"
+import { Cross1Icon } from '@radix-ui/react-icons'
+import DeleteIcon from '@mui/icons-material/Delete';
+import { useSearchParams, useParams } from 'react-router-dom';
+
+import {
+    doc,
+    onSnapshot
+} from "firebase/firestore";
+import { db } from "../../firebase";
+import { getAuth } from "firebase/auth";
+
+export default function TaskPanel({ open, onClose, task }) {
+    const [searchParams, setSearchParams] = useSearchParams()
+    const [loadTask, setTask] = useState(null)
+    const { id } = useParams();
+    const {
+        currentUser: { uid },
+      } = getAuth();
+
+
+    useEffect(() => {
+        if (searchParams.has('task') && searchParams.has('column')) {
+            const docRef = doc(db, `users/${uid}/boardsData/${id}`)
+            onSnapshot(docRef, (doc) => {
+                const { columns } = doc.data()
+                setTask(columns[searchParams.get('column')].tasks.find((task) => task.id == searchParams.get('task')))
+            })
+        }
+
+    }, [])
+
+    return (
+        <>
+            <Drawer
+                anchor='right'
+                open={searchParams.has('task') || searchParams.has('column') == true ? true : open}
+                onClose={onClose}
+                sx={{
+                    ".MuiDrawer-paper": {
+                        background: 'rgb(23 23 23)',
+                        borderTopLeftRadius: '10px',
+                        borderBottomLeftRadius: "10px",
+                        width: {xs: "100%", md: "900px"},
+                        maxWidth: "1000px",
+                    }
+                }}
+            >
+                <Box sx={{
+                    p: 5,
+                    color: ' rgb(245 245 245)',
+                    maxWidth: "100%",
+                    display: "flex",
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: "flex-end"
+                }}>
+                    <Typography
+                        variant='h6'
+                        fontWeight="600"
+                        fontFamily="Raleway"
+                        sx={{
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            display: "-webkit-box",
+                            WebkitLineClamp: "5",
+                            WebkitBoxOrient: "vertical",
+                            width: "700px",
+                            fontSize: '16px'
+                        }}
+                    >{task !== undefined ? task : loadTask.task}</Typography>
+                    <Button variant='text'
+                        size="small"
+                        sx={{
+                            m: 0,
+                            p: 0,
+                            color: "rgb(115 115 115)",
+                            fontFamily: "Raleway",
+                            fontWeight: "600",
+                            "&:hover": {
+                                background: "rgba(82, 82, 82, 0.2)",
+                            }
+                        }}>
+                        Edit Title
+                    </Button>
+                    <IconButton
+                        aria-label="close"
+                        onClick={onClose}
+                        sx={{
+                            position: 'absolute',
+                            right: 10,
+                            top: 10,
+                            color: 'rgb(229 229 229)',
+                        }}
+                    >
+                        <Cross1Icon />
+                    </IconButton>
+
+                </Box>
+                <Divider sx={{ background: "rgb(82 82 82)" }} />
+                <Box sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    height: "100%"
+                }}>
+                    <Box sx={{ p: 5, width: "100%" }}>
+                        <Typography
+                            fontFamily="Raleway"
+                            fontWeight="500"
+                            sx={{
+                                color: "rgba(115, 115, 115, 1)"
+                            }}>No description provided
+                        </Typography>
+                    </Box>
+                    <Divider orientation='vertical' sx={{ background: "rgb(82 82 82)" }} />
+                    <Box sx={{ p: 5, display: 'flex', flexDirection: 'column' }}>
+                        <Button
+                            disableRipple
+                            variant='text'
+                            startIcon={<DeleteIcon />}
+                            sx={{
+                                textTransform: 'none',
+                                color: 'rgba(255, 255, 255, 0.4)',
+                                "&.MuiButton-outlined": {
+                                    border: "1px solid rgb(64 64 64)",
+                                },
+                                width: "max-content",
+                                justifyContent: "flex-start",
+                                "&:hover": {
+                                    backgroundColor: "rgb(34 34 34)"
+                                }
+                            }}
+                        >
+                            Delete Item
+                        </Button>
+                    </Box>
+                </Box>
+            </Drawer>
+        </>
+    )
+}
