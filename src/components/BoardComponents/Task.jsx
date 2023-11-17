@@ -1,14 +1,30 @@
 import {useState, useRef} from 'react'
-import { Box, Chip, Typography, IconButton } from '@mui/material'
+import { Box, Chip, Typography, IconButton, Link, useTheme } from '@mui/material'
 import { Draggable } from '@hello-pangea/dnd'
 
 import { DotsHorizontalIcon } from "@radix-ui/react-icons"
 import TaskPopover from './TaskPopover'
+import TaskPanel from '../TaskPanel/TaskPanel'
 
+import { useSearchParams } from 'react-router-dom'
+import AddTaskForm from './AddTaskForm'
 
-export default function Task({id, index, task, status, number, handleRemoveTask}) {
+export default function Task({
+    id, 
+    index, 
+    task, 
+    status, 
+    number, 
+    handleRemoveTask,
+    associatedColumn,
+    handleTaskUpdate
+}) {
     const [openPopover, setOpenPopOver] = useState(false)
+    const [openEditTask, setOpenEditTask] = useState(false)
     const [anchorEl, setAnchorEl] = useState(null);
+    const [openTaskPanel, setOpenTaskPanel] = useState(false)
+
+    const [searchParams, setSearchParams] = useSearchParams()
 
     const anchorRef = useRef()
 
@@ -16,6 +32,25 @@ export default function Task({id, index, task, status, number, handleRemoveTask}
         setOpenPopOver(!openPopover)
         setAnchorEl(anchorRef.current)
     }
+
+    const handleTaskClose = () => {
+        setOpenTaskPanel(false)
+        if(searchParams.has('task') && searchParams.has('column')) {
+            searchParams.delete('column')
+            searchParams.delete('task')
+            setSearchParams(searchParams)
+        }
+    } 
+
+    const handleTaskOpen = () => {
+        setOpenTaskPanel(true)
+        setSearchParams({
+            task: id,
+            column: associatedColumn,
+        })
+    }
+
+    const theme = useTheme()
 
     return (
         <>
@@ -31,11 +66,12 @@ export default function Task({id, index, task, status, number, handleRemoveTask}
                         sx={{
                             display: "flex",
                             flexDirection: "column",
-                            backgroundColor: "rgb(30 30 30)",
-                            border: "1px solid rgba(229, 229, 229, 0.1)",
+                            backgroundColor: theme.palette.currentTheme === "dark" ? "rgb(30 30 30)" : "rgb(226 232 240)" ,
+                            border: "1px solid rgb(45 45 45)",
                             borderRadius: "4px",
                             p: 1,
                             mt: 1,
+                            mr: 1,
                             "&:first-of-type": {
                                 mt: 0
                             },
@@ -43,7 +79,7 @@ export default function Task({id, index, task, status, number, handleRemoveTask}
                                 mb: 7,
                             },
                             "&:hover": {
-                                border: "1px solid rgba(229, 229, 229, 0.25)",
+                                border: "1px solid rgb(64 64 64)",
                             }
                         }}
                     >
@@ -85,18 +121,28 @@ export default function Task({id, index, task, status, number, handleRemoveTask}
                         <Box sx={{
                             mt: 1,
                         }}>
-                            <Typography
+                            <Link
                                 variant='body2'
+                                fontWeight="400"
+                                fontFamily="Poppins"
                                 sx={{
                                     overflow: "hidden",
                                     textOverflow: "ellipsis",
                                     display: "-webkit-box",
                                     WebkitLineClamp: "5",
                                     WebkitBoxOrient: "vertical",
-                                }}
+                                    cursor: 'pointer',
+                                    color: theme.palette.currentTheme === "dark" ? 'white' : 'rgb(23 23 23)',
+                                    textDecoration: 'none',
+                                    '&:hover': {
+                                        color: "rgb(37 99 235)",
+                                        textDecoration: 'underline',
+                                    }
+                                }} 
+                                onClick={() => handleTaskOpen()}
                             >
                                 {task}
-                            </Typography>
+                            </Link>
                         </Box>
 
                         {/* Task Tags/Additonal Information */}
@@ -109,6 +155,9 @@ export default function Task({id, index, task, status, number, handleRemoveTask}
                             <Chip
                                 label="Chip Filled"
                                 size='small'
+                                sx={{
+                                    fontSize: "12px",
+                                }}
                             />
                         </Box>
                     </Box>
@@ -119,6 +168,20 @@ export default function Task({id, index, task, status, number, handleRemoveTask}
                 onClose={() => setOpenPopOver(!openPopover)} 
                 anchor={anchorEl}
                 handleRemoveTask={() => handleRemoveTask()}
+                openEditTask={() => setOpenEditTask(true)}
+            />}
+            {openTaskPanel && <TaskPanel
+                open={openTaskPanel}
+                onClose={() => handleTaskClose()}
+                task={task}
+            />}
+            {openEditTask && <AddTaskForm
+                open={openEditTask}
+                onClose={() => setOpenEditTask(!openEditTask)}
+                mode={'edit'}
+                currentTask={task}
+                columnName={associatedColumn}
+                handleTaskUpdate={handleTaskUpdate}
             />}
         </>
     )

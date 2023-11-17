@@ -51,7 +51,11 @@ const useFirebaseHooks = () => {
 
   const deleteBoard = async (id) => {
     try {
+      const docRef =  doc(db, `users/${uid}/boards/${id}`)
+      await deleteDoc(docRef)
 
+      const tBoards = boards.filter((board) => board.id !== id);
+      setBoards(tBoards);
     }
     catch (error) { 
       throw error

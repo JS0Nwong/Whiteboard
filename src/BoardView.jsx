@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import Board from './components/BoardComponents/Board'
 import Menubar from './components/BoardComponents/Menubar'
+import List from './components/BoardComponents/List'
 
 import {
     doc,
@@ -13,7 +14,7 @@ import {
 import { db } from "../src/firebase";
 import { getAuth } from "firebase/auth";
 
-import useBoard from "./utils/useBoard"
+import BoardLoading from "./components/LoadingComponents/BoardLoading"
 
 export default function BoardView() {
     const navigate = useNavigate()
@@ -21,9 +22,12 @@ export default function BoardView() {
     const [orderBy, setOrderBy] = useState(null)
     const [lastUpdated, setLastUpdated] = useState(null)
     const [loading, setLoading] = useState(true)
+    const [listData, setListData] = useState(null)
+    const [toggleListView, setToggleListView] = useState(false)
+    // get current user
     const {
         currentUser: { uid },
-      } = getAuth();
+    } = getAuth();
 
     // Gets board id from URL params
     const { id } = useParams();
@@ -35,23 +39,38 @@ export default function BoardView() {
     const board = useMemo(() => boards.find((board) => board.id === id), [])
     const boardsData = useMemo(() => boardData, [boardData])
 
-    const {initialData, setInitialData, lastUpdatedTimestamp} = useBoard(uid, id)
-
     useEffect(() => {
         const docRef = doc(db, `users/${uid}/boardsData/${id}`)
         onSnapshot(docRef, (doc) => {
-          const {columns, lastUpdated, orderBy} = doc.data()
-          
-          setBoardData(columns);
-          setOrderBy(orderBy)
-        //   setLastUpdated(lastUpdated.toDate().toLocaleString("en-US"));
-          setLoading(false)
+            const { columns, lastUpdated, orderBy } = doc.data()
+
+            setBoardData(columns);
+            setOrderBy(orderBy)
+            //   setLastUpdated(lastUpdated.toDate().toLocaleString("en-US"));
+            setLoading(false)
+
+            const rows = []
+
+            orderBy.map((key, index) => {
+                columns[key].tasks.map((task, index) => {
+                    Object.assign(task, {
+                        ...task,
+                        status: key,
+                        associatedColor: columns[key].columnColor
+                    })
+                    rows.push(task)
+                })
+            })
+            setListData(rows)
         })
+
+        console.log(toggleListView)
+
     }, [])
 
     if (!board) return null
-    if (loading) return <></>
-    if (!boardData) setLoading(true)
+    if (loading) return <BoardLoading />
+    if (!boardData) return setLoading(true)
 
     return (
         <>
@@ -59,18 +78,27 @@ export default function BoardView() {
                 height: "100dvh",
                 display: "flex",
                 flexDirection: 'column',
-                minWidth: "100%"
+                minWidth: "100%",
             }}>
-                <Menubar 
-                    data={board} 
+                <Menubar
+                    data={board}
                     lastUpdated={lastUpdated}
+                    setToggleListView={() => setToggleListView(!toggleListView)}
                 />
-                <Board
-                    columns={boardsData}
-                    orderBy={orderBy}
-                    id={id}
-                    lastUpdated={lastUpdated}
-                />
+                {toggleListView ?
+                    <List
+                        data={listData}
+                        orderBy={orderBy}
+                        id={id}
+                    />
+                    :
+                    <Board
+                        columns={boardsData}
+                        orderBy={orderBy}
+                        id={id}
+                        lastUpdated={lastUpdated}
+                    />
+                }
             </div>
         </>
     )

@@ -3,18 +3,22 @@ import {
     Popover,
     Box,
     Typography,
-    Divider,
     Button,
 } from "@mui/material"
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { Pencil1Icon } from '@radix-ui/react-icons';
+import useFirebaseHooks from "../../utils/firebaseHooks"
 
-import DeletePopover from './DeletePopover';
+import DeleteBoard from './DeleteBoard';
 
-export default function ColumnPopover({ open, onClose, anchor, number, handleRemoveColumn, setOpenEdit }) {
-
+export default function CardPopover({ open, onClose, anchor, id }) {
     const [openDelete, setOpen] = useState(false)
+
+    const {deleteBoard} = useFirebaseHooks()
+
+    const handleRemoveBoard = () => {
+        deleteBoard(id)
+    }
 
     return (
         <>
@@ -41,42 +45,6 @@ export default function ColumnPopover({ open, onClose, anchor, number, handleRem
                 <Box sx={{
                     m: 2,
                 }}>
-                    <Box sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        width: "100%",
-                    }}>
-                        <Typography
-                            variant='caption'
-                            sx={{
-                                color: "rgba(255, 255, 255, 0.4)",
-                            }}
-                        >Items</Typography>
-                        <Button 
-                            variant="text" 
-                            startIcon={<DeleteIcon />}
-                            size='small'
-                            sx={{
-                                mt: 1,
-                                width: "100%",
-                                textTransform: 'none',
-                                color: 'rgb(220 38 38)',
-                                justifyContent: "flex-start",
-                                "&:hover": {
-                                    backgroundColor: "rgba(220, 38, 38, 0.3)"
-                                }
-                            }}
-                        >
-                            Delete
-                        </Button>
-                    </Box>
-
-                    <Divider sx={{
-                        background: 'rgba(255, 255, 255, 0.4)',
-                        mt: 2,
-                        mb: 1,
-                        width: "100%"
-                    }} />
 
                     <Box sx={{
                         display: 'flex',
@@ -87,7 +55,7 @@ export default function ColumnPopover({ open, onClose, anchor, number, handleRem
                             sx={{
                                 color: "rgba(255, 255, 255, 0.4)"
                             }}
-                        >Column</Typography>
+                        >Board</Typography>
                          <Button 
                             fullWidth
                             variant="text" 
@@ -130,11 +98,10 @@ export default function ColumnPopover({ open, onClose, anchor, number, handleRem
                     </Box>
                 </Box>
             </Popover>
-            {openDelete && <DeletePopover 
+            {openDelete && <DeleteBoard 
                 open={open} 
                 onClose={() => setOpen(!open)}
-                number={number}
-                handleRemoveColumn={() => handleRemoveColumn()}
+                handleRemoveBoard={() => handleRemoveBoard()}
             />}
         </>
     )

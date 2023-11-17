@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import { Box, Icon, IconButton, Typography, Button } from '@mui/material'
+import { Box, Icon, IconButton, Typography, Button, useTheme } from '@mui/material'
 import Task from './Task'
 
 import { Draggable, Droppable } from '@hello-pangea/dnd'
@@ -8,6 +8,7 @@ import AddIcon from '@mui/icons-material/Add';
 
 import AddTaskForm from "./AddTaskForm"
 import ColumnPopover from './ColumnPopover'
+import AddColumnForm from './AddColumnForm'
 
 export default function Column({
     index,
@@ -15,12 +16,16 @@ export default function Column({
     columnName,
     handleAddTask,
     handleRemoveColumn,
-    handleRemoveTask
+    handleRemoveTask,
+    handleColumnUpdate,
+    handleTaskUpdate,
 }) 
 {
     const [addTask, setAddTask] = useState(false)
     const [openPopover, setOpenPopOver] = useState(false)
     const [anchorEl, setAnchorEl] = useState(null);
+    const [openEdit, setOpenEdit ] = useState(false)
+    const theme = useTheme()
 
     const anchorRef = useRef()
 
@@ -49,7 +54,7 @@ export default function Column({
                             width: "100%",
                             minWidth: "300px",
                             maxWidth: "300px",
-                            backgroundColor: "rgb(17 17 17)",
+                            backgroundColor: theme.palette.currentTheme === "dark" ? "rgb(17 17 17)" : "rgb(229 231 235)",
                             position: "relative",
                         }}>
                         {/* Column Header (Title, Description, Tasks Number, Color, Settings) */}
@@ -83,6 +88,7 @@ export default function Column({
                                     <Typography
                                         fontWeight="600"
                                         fontFamily="Raleway"
+
                                     >
                                         {columnName}
                                     </Typography>
@@ -115,8 +121,8 @@ export default function Column({
                                     />
                                 </IconButton>
                             </Box>
-                            <Typography variant='subtitle2' sx={{
-                                color: "rgba(255, 255, 255, 0.4)"
+                            <Typography variant='subtitle2' fontFamily="Poppins"sx={{
+                                color: "rgb(82 82 82)"
                             }}>
                                 {data.description}
                             </Typography>
@@ -139,8 +145,6 @@ export default function Column({
                                         overflowY: 'auto',
                                         "&::-webkit-scrollbar": {
                                             width: "2px",
-                                            m: 0,
-                                            p: 0,
                                         },
                                         "&::-webkit-scrollbar-thumb": {
                                             width: "4px",
@@ -156,6 +160,8 @@ export default function Column({
                                             task={task.task}
                                             index={index}
                                             handleRemoveTask={() => handleRemoveTask(columnName, task.id)}
+                                            associatedColumn={columnName}
+                                            handleTaskUpdate={handleTaskUpdate}
                                         />
                                     ))}
                                     {provided.placeholder}
@@ -165,7 +171,7 @@ export default function Column({
 
                         {/* Add Task to Column Button */}
                         <Box sx={{
-                            backgroundColor: "rgb(17 17 17)",
+                            backgroundColor:theme.palette.currentTheme === "dark" ? "rgb(17 17 17)" : "rgb(229 231 235)",
                             position: "absolute",
                             bottom: 0,
                             width: "100%",
@@ -177,15 +183,13 @@ export default function Column({
                                 startIcon={<AddIcon />}
                                 sx={{
                                     textTransform: 'none',
-                                    color: 'rgba(255, 255, 255, 0.4)',
-                                    "&.MuiButton-outlined": {
-                                        border: "1px solid rgb(64 64 64)",
-                                    },
+                                    color: 'rgb(115 115 115)',
                                     width: "100%",
                                     justifyContent: "flex-start",
                                     "&:hover": {
                                         backgroundColor: "rgb(34 34 34)"
-                                    }
+                                    },
+                                    fontFamily: "Poppins",
                                 }}
                                 onClick={() => setAddTask(!addTask)}
                             >
@@ -207,6 +211,17 @@ export default function Column({
                 anchor={anchorEl}
                 number={data.tasks.length}
                 handleRemoveColumn={() => handleRemoveColumn(columnName)}
+                setOpenEdit={() => setOpenEdit(!openEdit)}
+            />}
+            {/* Edit column */}
+            {openEdit && <AddColumnForm 
+                open={openEdit}
+                onClose={() => setOpenEdit(!openEdit)}
+                mode={'edit'}
+                existingColumnName={columnName}
+                currentColor={data.columnColor}
+                currentDescription={data.description}
+                handleColumnUpdate={handleColumnUpdate}
             />}
         </>
     )

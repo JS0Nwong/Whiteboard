@@ -2,9 +2,9 @@ import React from 'react'
 import { Dialog, Typography, Box, Button, DialogTitle, IconButton, DialogActions, DialogContent} from '@mui/material'
 import { Cross1Icon } from '@radix-ui/react-icons'
 
-export default function DeleteItem({open, onClose, handleRemoveTask}) {
+export default function DeleteBoard({open, onClose, handleRemoveBoard}) {
   const handleSubmit = () => {
-    handleRemoveTask()
+    handleRemoveBoard()
   }
 
   return (
@@ -25,7 +25,7 @@ export default function DeleteItem({open, onClose, handleRemoveTask}) {
         fontWeight: "500",
         fontSize: "1rem"
       }}>
-        Delete Item
+        Delete Board
       </DialogTitle>
 
       <IconButton
@@ -48,8 +48,8 @@ export default function DeleteItem({open, onClose, handleRemoveTask}) {
         justifyContent: 'center',
         color: "rgb(115 115 115)"
       }}>
-        <Typography>Are you sure you want to delete this item.
-          <span style={{fontWeight: "600"}}> This cannot be undone.</span>
+        <Typography>Are you sure you want to delete this Board.
+          <span style={{fontFamily:"Raleway", fontWeight: "600"}}> This cannot be undone.</span>
         </Typography>
       </DialogContent>
 

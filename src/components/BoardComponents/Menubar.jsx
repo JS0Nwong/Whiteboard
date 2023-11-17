@@ -1,5 +1,5 @@
-import React from 'react'
-import { Box, Button, IconButton, Typography, Divider } from '@mui/material'
+import { useContext, useState, useRef} from 'react'
+import { Box, Button, IconButton, Typography, Divider, useTheme } from '@mui/material'
 import {
     SunIcon,
     MoonIcon,
@@ -8,93 +8,138 @@ import {
     HomeIcon,
     GearIcon,
     LayoutIcon,
-    Share1Icon
+    Share1Icon,
+    TableIcon
 } from "@radix-ui/react-icons";
+import { ThemeContext } from "../../App"
+import SettingsPanel from './SettingsPanel';
 
-export default function Menubar({data}) {
+export default function Menubar({ data, setToggleListView }) {
+    const colorMode = useContext(ThemeContext)
+    const theme = useTheme()
+
+    const [anchorEl, setAnchorEl] = useState(null)
+    const [openSetting, setOpenSetting] = useState(false)
+    const [switchView, setSwitchView] = useState(false)
+
+    const anchorRef = useRef()
+
+    const handleOpenSettings = () =>  {
+        setAnchorEl(anchorRef.current)
+        setOpenSetting(!openSetting)
+    }
+
+    const handleSwitchView = () => {
+        setSwitchView(!switchView)
+        setToggleListView()
+    }
+
     return (
-        <Box sx={{
-            m: 1,
-            border: "1px solid rgba(229, 229, 229, 0.25)",
-            borderRadius: '4px',
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-        }}>
-            {/* Project Info */}
-            <Box>
-                <Typography
-                    variant='h6'
-                    fontWeight="600"
-                    fontSize="1.7rem"
+        <>
+            <Box sx={{
+                m: 1,
+                border: "1px solid rgb(64 64 64)",
+                borderRadius: '4px',
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+            }}>
+                {/* Project Info */}
+                <Box>
+                    <Typography
+                        variant='h6'
+                        fontWeight="600"
+                        fontSize="1.7rem"
+                        fontFamily="Raleway"
+                        sx={{
+                            textAlign: 'center',
+                            ml: 1,
+                            mr: 1,
+                        }}>
+                        {data.name}
+                    </Typography>
+                </Box>
+                <Box
                     sx={{
-                        textAlign: 'center',
-                        ml: 1,
-                        mr: 1,
+                        display: "flex",
+                        flexDirection: "row"
+                    }}
+                >
+                    <IconButton sx={{
+                        borderRadius: "5px",
+                        m: 1,
+                        border: '1px solid  rgba(82, 82, 82, 1)'
                     }}>
-                    {data.name}
-                </Typography>
-            </Box>
-            <Box
-                sx={{
-                    display: "flex",
-                    flexDirection: "row"
-                }}
-            >
-                <IconButton sx={{
-                    borderRadius: "5px",
-                    m: 1,
-                    border: '1px solid  rgba(82, 82, 82, 1)'
-                }}>
-                    <CaretLeftIcon style={{ width: "20px", height: "20px", color: 'rgba(163, 163, 163, 1)' }} />
-                </IconButton>
-                <IconButton sx={{
-                    borderRadius: "5px",
-                    m: 1,
-                    border: '1px solid  rgba(82, 82, 82, 1)'
-                }}>
-                    <HomeIcon style={{ width: "20px", height: "20px", color: 'rgba(163, 163, 163, 1)' }} />
-                </IconButton>
-                <IconButton sx={{
-                    borderRadius: "5px",
-                    m: 1,
-                    border: '1px solid  rgba(82, 82, 82, 1)'
-                }}>
-                    <CaretRightIcon style={{ width: "20px", height: "20px", color: 'rgba(163, 163, 163, 1)' }} />
-                </IconButton>
+                        <CaretLeftIcon style={{ width: "20px", height: "20px", color: 'rgba(163, 163, 163, 1)' }} />
+                    </IconButton>
+                    <IconButton sx={{
+                        borderRadius: "5px",
+                        m: 1,
+                        border: '1px solid  rgba(82, 82, 82, 1)'
+                    }}>
+                        <HomeIcon style={{ width: "20px", height: "20px", color: 'rgba(163, 163, 163, 1)' }} />
+                    </IconButton>
+                    <IconButton sx={{
+                        borderRadius: "5px",
+                        m: 1,
+                        border: '1px solid  rgba(82, 82, 82, 1)'
+                    }}>
+                        <CaretRightIcon style={{ width: "20px", height: "20px", color: 'rgba(163, 163, 163, 1)' }} />
+                    </IconButton>
 
-                <Divider orientation="vertical" flexItem sx={{ backgroundColor: 'rgba(229, 229, 229, 0.25)', mt: 1, mb: 1, mr: 0.5, ml: 0.5 }} />
+                    <Divider orientation="vertical" flexItem sx={{ backgroundColor: 'rgba(229, 229, 229, 0.25)', mt: 1, mb: 1, mr: 0.5, ml: 0.5 }} />
 
-                <IconButton sx={{
-                    borderRadius: "5px",
-                    m: 1,
-                    border: '1px solid  rgba(82, 82, 82, 1)'
-                }}>
-                    <LayoutIcon style={{ width: "20px", height: "20px", color: 'rgba(163, 163, 163, 1)' }} />
-                </IconButton>
-                <IconButton sx={{
-                    borderRadius: "5px",
-                    m: 1,
-                    border: '1px solid  rgba(82, 82, 82, 1)'
-                }}>
-                    <SunIcon style={{ width: "20px", height: "20px", color: 'rgba(163, 163, 163, 1)' }} />
-                </IconButton>
-                <IconButton sx={{
-                    borderRadius: "5px",
-                    m: 1,
-                    border: '1px solid  rgba(82, 82, 82, 1)'
-                }}>
-                    <Share1Icon style={{ width: "20px", height: "20px", color: 'rgba(163, 163, 163, 1)' }} />
-                </IconButton>
-                <IconButton sx={{
-                    borderRadius: "5px",
-                    m: 1,
-                    border: '1px solid  rgba(82, 82, 82, 1)'
-                }}>
-                    <GearIcon style={{ width: "20px", height: "20px", color: 'rgba(163, 163, 163, 1)' }} />
-                </IconButton>
+                    <IconButton sx={{
+                        borderRadius: "5px",
+                        m: 1,
+                        border: '1px solid  rgba(82, 82, 82, 1)'
+                    }}
+                        onClick={() => handleSwitchView()}
+                    >
+                        {switchView ? 
+                        <LayoutIcon style={{ width: "20px", height: "20px", color: 'rgba(163, 163, 163, 1)' }} />
+                        : 
+                        <TableIcon style={{ width: "20px", height: "20px", color: 'rgba(163, 163, 163, 1)' }} />}
+                    </IconButton>
+
+                    <IconButton sx={{
+                        borderRadius: "5px",
+                        m: 1,
+                        border: '1px solid  rgba(82, 82, 82, 1)'
+                    }}
+                        onClick={colorMode.toggleTheme}
+                    >
+                        {theme.palette.currentTheme == "dark" ?
+                            <SunIcon style={{ width: "20px", height: "20px", color: 'rgba(163, 163, 163, 1)' }} /> :
+                            <MoonIcon style={{ width: "20px", height: "20px", color: 'rgba(163, 163, 163, 1)' }} />
+                        }
+                    </IconButton>
+
+                    <IconButton sx={{
+                        borderRadius: "5px",
+                        m: 1,
+                        border: '1px solid  rgba(82, 82, 82, 1)'
+                    }}>
+                        <Share1Icon style={{ width: "20px", height: "20px", color: 'rgba(163, 163, 163, 1)' }} />
+                    </IconButton>
+                    <IconButton sx={{
+                        borderRadius: "5px",
+                        m: 1,
+                        border: '1px solid  rgba(82, 82, 82, 1)'
+                    }}
+                        onClick={() => handleOpenSettings()}
+                        ref={anchorRef}
+                    >
+                        <GearIcon style={{ width: "20px", height: "20px", color: 'rgba(163, 163, 163, 1)' }} />
+                    </IconButton>
+                </Box>
             </Box>
-        </Box>
+            {openSetting && <SettingsPanel 
+                open={openSetting}
+                onClose={() => setOpenSetting(!openSetting)}
+                anchor={anchorEl}
+            />}
+        </>
     )
 }

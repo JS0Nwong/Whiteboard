@@ -1,11 +1,10 @@
-import React, { useState, useCallback, useEffect } from 'react'
-import { Box, Typography } from '@mui/material'
+import { useState, useCallback } from 'react'
+import { Box } from '@mui/material'
 import Column from './Column'
 import AddColumn from './AddColumn'
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import { DragDropContext, Droppable } from '@hello-pangea/dnd'
 
 import useFirebaseHooks from '../../utils/firebaseHooks'
-import useStore from '../../store'
 import useReorder from '../../utils/reorder'
 
 export default function Board({ columns, id, orderBy }) {
@@ -39,13 +38,55 @@ export default function Board({ columns, id, orderBy }) {
 
     }
 
+    const handleTaskUpdate = async (task, currentTask, description, columnName) => {
+        const clone = structuredClone(tasks)
+        clone[columnName].tasks.find((task) => task.task === currentTask).task = task
+        try {
+            await handleBoardUpdate(clone)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    
+    const handleColumnUpdate = async(original, newColumn, description, color) => {
+        console.log(original, newColumn, description, color)
+        var dataClone = structuredClone(tasks)
+
+        if (original !== newColumn) {
+            delete Object.assign(dataClone, {
+                [newColumn]: {
+                    columnColor: color,
+                    description: description,
+                    tasks: dataClone[original].tasks,
+                }
+            })[original]
+
+        }
+        else {
+            Object.assign(dataClone, {
+                [original]: {
+                    columnColor: color,
+                    description: description,
+                    tasks: dataClone[original].tasks,
+                }
+            })[original]
+        }
+
+        try {
+            setTasks(dataClone)
+            setKeys(Object.keys(dataClone))
+            await handleBoardUpdate(dataClone)
+            await handleOrderUpdate(Object.keys(dataClone))
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     const handleRemoveTask = useCallback(async (column, task) => { 
         const data = structuredClone(tasks)
         const removed = data[column].tasks.findIndex((t) => t.id === task)
         data[column].tasks.splice(removed, 1)
-
-        console.log(data)
-
         try {
             await handleBoardUpdate(data)
         } catch (error) {
@@ -173,6 +214,8 @@ export default function Board({ columns, id, orderBy }) {
                                     index={index}
                                     handleRemoveColumn={handleRemoveColumn}
                                     handleRemoveTask={handleRemoveTask}
+                                    handleColumnUpdate={handleColumnUpdate}
+                                    handleTaskUpdate={handleTaskUpdate}
                                 />
                             ))}
                             {provided.placeholder}
