@@ -7,14 +7,14 @@ export default defineConfig({
   commonjsOptions: {
     esmExternals: true,
   },
-  // build: {
-  //   rollupOptions: {
-  //     external: ["react", "react-router", "react-router-dom", "react-redux"],
-  //     output: {
-  //       globals: {
-  //         react: "React",
-  //       },
-  //     },
-  //   },
-  // }
+  build: {
+    rollupOptions: {
+      external: ["react", "react-router", "react-router-dom", "react-redux"],
+      output: {
+        globals: {
+          react: "React",
+        },
+      },
+    },
+  }
 })

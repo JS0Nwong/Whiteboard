@@ -92,8 +92,6 @@ function App() {
     }
   }), [currentTheme])
 
-  useEffect(() => {console.log(currentTheme)}, [currentTheme])
-
   return (
     <ThemeContext.Provider value={themeMode}>
       <ThemeProvider theme={theme}>
@@ -102,8 +100,5 @@ function App() {
     </ThemeContext.Provider>
   )
 }
-
-
-
 
 export default App
