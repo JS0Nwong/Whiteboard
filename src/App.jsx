@@ -46,7 +46,7 @@ function AppRoutes() {
 }
 
 function App() {
-  const [currentTheme, setTheme] = useState(() => (localStorage.getItem('theme')) || defaultTheme)
+  const [currentTheme, setTheme] = useState(() => (localStorage.getItem('theme')| defaultTheme))
   const themeMode = useMemo(() => ({
     toggleTheme: () => {
       setTheme((prevMode) => (prevMode === 'light' ? 'dark' : 'light'))
