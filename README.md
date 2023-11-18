@@ -1,4 +1,9 @@
 # Whiteboard ✨
+![React](https://img.shields.io/badge/React-18.2.0-61dafb)
+![React Beautiful DND](https://img.shields.io/badge/react_beautiful_dnd-13.0.0-0baf7c)
+![Firebase](https://img.shields.io/badge/Firebase-10.5.2-ffa611)
+![Material UI](https://img.shields.io/badge/Material_UI-11.11.1-06b6d4)
+![Zustand](https://img.shields.io/badge/Zustand-^4.4.6-333383)
 
 ## Overview
 
