@@ -46,10 +46,10 @@ function AppRoutes() {
 }
 
 function App() {
-  const [currentTheme, setTheme] = useState(() => (localStorage.getItem('theme')| defaultTheme))
+  const [currentTheme, setTheme] = useState(() => (localStorage.getItem('theme') || defaultTheme))
   const themeMode = useMemo(() => ({
     toggleTheme: () => {
-      setTheme((prevMode) => (prevMode === 'light' ? 'dark' : 'light'))
+      setTheme((prevMode) => (prevMode == 'light' ? 'dark' : 'light'))
       localStorage.setItem('theme', currentTheme)
     }
   }), [])
@@ -92,8 +92,6 @@ function App() {
     }
   }), [currentTheme])
 
-  useEffect(() => {console.log(currentTheme)}, [currentTheme])
-
   return (
     <ThemeContext.Provider value={themeMode}>
       <ThemeProvider theme={theme}>
@@ -102,8 +100,5 @@ function App() {
     </ThemeContext.Provider>
   )
 }
-
-
-
 
 export default App

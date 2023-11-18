@@ -77,7 +77,9 @@ export default function Menubar({ data, setToggleListView }) {
                         borderRadius: "5px",
                         m: 1,
                         border: '1px solid  rgba(82, 82, 82, 1)'
-                    }}>
+                    }}
+                        href="/boards"
+                    >
                         <HomeIcon style={{ width: "20px", height: "20px", color: 'rgba(163, 163, 163, 1)' }} />
                     </IconButton>
                     <IconButton sx={{
