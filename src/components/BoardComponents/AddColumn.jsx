@@ -12,7 +12,6 @@ export default function AddColumn({addColumn}) {
             <Box
                 sx={{
                     m: 1,
-                    width: "100%",
                     minWidth: "230px"
                 }}>
                 <IconButton

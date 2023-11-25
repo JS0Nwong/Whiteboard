@@ -11,6 +11,7 @@ import {
   Input,
   FormControl,
   FormLabel,
+  useTheme
 } from '@mui/material'
 import { Cross1Icon } from '@radix-ui/react-icons'
 
@@ -35,18 +36,19 @@ export default function AddColumnForm({
   handleColumnUpdate,
   currentDescription
 }) {
+  const theme = useTheme()
   const [columnName, setColumnName] = useState(existingColumnName !== undefined ? existingColumnName :'')
   const [description, setDescription] = useState(currentDescription !== undefined ? currentDescription : '')
-  const [color, setColor] = useState(currentColor !== undefined ? currentColor : '52, 58, 64')
+  const [currentColorFocus, setColor] = useState(currentColor !== undefined ? currentColor : '52, 58, 64')
 
   const handleSubmit = () => {
     if(mode ==='edit') {
-      handleColumnUpdate(existingColumnName, columnName, description, color)
+      handleColumnUpdate(existingColumnName, columnName, description, currentColorFocus)
       onClose()
     }
     else {
       if(!columnName.trim()) alert('name cannot be empty')
-      addColumn(columnName, description, color) 
+      addColumn(columnName, description, currentColorFocus) 
       onClose()
     }
   }
@@ -57,14 +59,13 @@ export default function AddColumnForm({
       onClose={onClose}
       sx={{
         ".MuiDialog-paper": {
-          background: 'rgb(17 17 17)',
+          background: theme.palette.currentTheme === "dark" ? "rgb(17 17 17)":  "rgb(229 231 235)",
           border: "1px solid rgb(64 64 64)",
           m: 1,
         }
       }}
     >
       <DialogTitle sx={{
-        color: 'white',
         fontWeight: "500",
         fontSize: "1rem",
         fontFamily: "Poppins"
@@ -92,9 +93,9 @@ export default function AddColumnForm({
         justifyContent: 'center',
       }}>
         <Box sx={{
-          backgroundColor: `rgba(${color.replace(/['"]+/g, '')}, 0.15)`,
-          color: `rgb(${color})`,
-          border: `1px solid rgb(${color})`,
+          backgroundColor: `rgba(${currentColorFocus.replace(/['"]+/g, '')}, 0.15)`,
+          color: `rgb(${currentColorFocus})`,
+          border: `1px solid rgb(${currentColorFocus})`,
           borderRadius: '999px',
           minWidth: "20px",
           minHeight: '20px',
@@ -113,7 +114,7 @@ export default function AddColumnForm({
           <Typography
             noWrap
             sx={{
-              color: `${color}`,
+              color: `${currentColorFocus}`,
               mr: 1,
               ml: 1,
               fontSize: "12px",
@@ -130,11 +131,7 @@ export default function AddColumnForm({
             <FormControl required>
               <FormLabel sx={{
                 "&.MuiFormLabel-root": {
-                  color: "white",
                   fontFamily: "Poppins"
-                },
-                ".Mui-focused": {
-                  color: "white"
                 },
                 ".MuiFormLabel-asterisk": {
                   color: "red"
@@ -149,25 +146,29 @@ export default function AddColumnForm({
               }}>
                 {colors.map((color, index) => (
                   <IconButton
-                    key={index}
-                    sx={{
+                  key={index}
+                  sx={{
+                    backgroundColor: `rgb(${color})`,
+                    height: "30px",
+                    width: "25px",
+                    borderRadius: "2px",
+                    outline: 
+                      currentColorFocus === color ? 
+                      `2px solid ${theme.palette.currentTheme === "dark" ? "rgb(255, 255, 255) ": "rgb(22, 22, 22)"}` : "none",
+                    outlineOffset: "2px",
+                    m: 0.5,
+                    "&:hover": {
                       backgroundColor: `rgb(${color})`,
-                      height: "30px",
-                      width: "25px",
-                      borderRadius: "2px",
-                      m: 0.5,
-                      "&:hover": {
-                        backgroundColor: `rgb(${color})`,
-                      },
-                      "&:first-of-type": {
-                        ml: 0,
-                      },
-                      "&:last-of-type": {
-                        mr: 0,
-                      }
-                    }}
-                    onClick={() => setColor(color)}
-                  >
+                    },
+                    "&:first-of-type": {
+                      ml: 0,
+                    },
+                    "&:last-of-type": {
+                      mr: 0,
+                    }
+                  }}
+                  onClick={() => setColor(color)}
+                >
                   </IconButton>
                 ))}
               </Box>
@@ -177,8 +178,9 @@ export default function AddColumnForm({
             <FormControl required>
               <FormLabel sx={{
                 "&.MuiFormLabel-root": {
-                  color: "white",
-                  fontFamily: "Poppins"
+                  color: theme.palette.currentTheme === "dark" ? "white" : "rgb(23 23 23)",
+                  fontFamily: "Poppins",
+                  fontWeight: "500"
                 },
                 ".Mui-focused": {
                   color: "white"
@@ -192,7 +194,6 @@ export default function AddColumnForm({
                 placeholder={existingColumnName !== undefined ? existingColumnName :"Name"}
                 disableUnderline
                 sx={{
-                  color: "#FFFFFF",
                   pl: 1,
                   pr: 1,
                   pb: 0.5,
@@ -215,11 +216,9 @@ export default function AddColumnForm({
             <FormControl>
               <FormLabel sx={{
                 "&.MuiFormLabel-root": {
-                  color: "white",
-                  fontFamily: "Poppins"
-                },
-                ".Mui-focused": {
-                  color: "white"
+                  color: theme.palette.currentTheme === "dark" ? "white" : "rgb(23 23 23)",
+                  fontFamily: "Poppins",
+                  fontWeight: "500"
                 },
                 mt: 1
               }}>Description: </FormLabel >
@@ -227,7 +226,6 @@ export default function AddColumnForm({
                 placeholder={currentDescription !== undefined ? currentDescription : "Description"}
                 disableUnderline
                 sx={{
-                  color: "#FFFFFF",
                   pl: 1,
                   pr: 1,
                   pb: 0.5,
@@ -240,6 +238,9 @@ export default function AddColumnForm({
                     "&.Mui-focused ": {
                       border: "1px solid #aaa"
                     }
+                  },
+                  "&.Mui-focused": {
+                    outline: '1px solid #111111'
                   }
                 }}
                 autoComplete="off"

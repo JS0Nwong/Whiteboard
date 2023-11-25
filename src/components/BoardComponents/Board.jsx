@@ -2,15 +2,17 @@ import { useState, useCallback } from 'react'
 import { Box } from '@mui/material'
 import Column from './Column'
 import AddColumn from './AddColumn'
+import Searchbar from './Searchbar'
 import { DragDropContext, Droppable } from '@hello-pangea/dnd'
 
 import useFirebaseHooks from '../../utils/firebaseHooks'
 import useReorder from '../../utils/reorder'
 
-export default function Board({ columns, id, orderBy }) {
+export default function Board({ columns, id, orderBy, labels }) {
     const { updateBoard, updateColumnKeys } = useFirebaseHooks()
     const { reorder, reorderMap, moveBetween } = useReorder()
     const [tasks, setTasks] = useState(structuredClone(columns))
+    const [filtered, setFiltered] = useState(structuredClone(columns))
     const [loading, setLoading] = useState(false)
 
     const [keys, setKeys] = useState(orderBy)
@@ -50,7 +52,6 @@ export default function Board({ columns, id, orderBy }) {
 
     
     const handleColumnUpdate = async(original, newColumn, description, color) => {
-        console.log(original, newColumn, description, color)
         var dataClone = structuredClone(tasks)
 
         if (original !== newColumn) {
@@ -99,7 +100,11 @@ export default function Board({ columns, id, orderBy }) {
         var data = structuredClone(tasks)
 
         data[columnName].tasks.push(
-            { task: task, id: crypto.randomUUID(), labels: [] }
+            { 
+                task: task, 
+                id: crypto.randomUUID(), 
+                labels: labels,
+            }
         )
 
         try {
@@ -182,6 +187,11 @@ export default function Board({ columns, id, orderBy }) {
 
     return (
         <>
+            <Box>
+                <Searchbar 
+                    setFilteredData={setFiltered}
+                />
+            </Box>
             <DragDropContext onDragEnd={handleDragEnd}>
                 <Droppable
                     droppableId={id}
@@ -194,14 +204,17 @@ export default function Board({ columns, id, orderBy }) {
                             ref={provided.innerRef}
                             sx={{
                                 height: '100%',
-                                maxHeight: "91%",
+                                maxHeight: {xs:"83%", md: "86%"},
                                 display: "flex",
-                                flexDirection: "row",
+                                flexDirection: {
+                                    xs:"column",
+                                    md: "row"
+                                },
                                 flex: "1, 1, auto",
                                 position: "fixed",
                                 bottom: '5px',
-                                overflowX: 'auto',
-                                overflowY: "hidden",
+                                overflowX: {xs: "hidden", md: "auto"},
+                                overflowY: {xs: "auto",  md:"hidden"},
                                 width: "100%",
                             }}>
 
@@ -209,9 +222,10 @@ export default function Board({ columns, id, orderBy }) {
                                 <Column
                                     key={key}
                                     columnName={key}
-                                    data={tasks[key]}
-                                    handleAddTask={handleAddTask}
+                                    data={filtered !== null ? filtered[key] : tasks[key]}
                                     index={index}
+                                    labels={labels}
+                                    handleAddTask={handleAddTask}
                                     handleRemoveColumn={handleRemoveColumn}
                                     handleRemoveTask={handleRemoveTask}
                                     handleColumnUpdate={handleColumnUpdate}

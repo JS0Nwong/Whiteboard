@@ -6,6 +6,8 @@ const store = (set) => ({
   boards: [],
   isLoggedIn: false,
   areBoardsFetched: false,
+  data: null,
+  filtered: null,
   addBoard: (board) =>
     set(
       (old) => ({
@@ -33,6 +35,20 @@ const store = (set) => ({
       false,
       "setAuth"
     ),
+  setData: (data) => 
+      set(
+        {
+          data: data,
+        },
+        false,
+        "setData"
+      ),
+  setFiltered: (data) => 
+      set(
+        {
+          filtered: data
+        }
+      )
 });
 
 const useStore = create(devtools(store));

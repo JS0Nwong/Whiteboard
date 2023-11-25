@@ -5,7 +5,9 @@ import {
     Typography,
     Divider,
     IconButton,
-    Button
+    Button,
+    Chip,
+    Stack
 } from "@mui/material"
 import { Cross1Icon } from '@radix-ui/react-icons'
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -18,7 +20,7 @@ import {
 import { db } from "../../firebase";
 import { getAuth } from "firebase/auth";
 
-export default function TaskPanel({ open, onClose, task }) {
+export default function TaskPanel({ open, onClose, task, labels }) {
     const [searchParams, setSearchParams] = useSearchParams()
     const [loadTask, setTask] = useState(null)
     const { id } = useParams();
@@ -55,55 +57,87 @@ export default function TaskPanel({ open, onClose, task }) {
                 }}
             >
                 <Box sx={{
-                    p: 5,
-                    color: ' rgb(245 245 245)',
-                    maxWidth: "100%",
-                    display: "flex",
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: "flex-end"
+                    display: 'flex',
+                    flexDirection: "column",
+                    pl: 5,
+                    pr: 5,
+                    pt: 5,
+                    pb: 3,
                 }}>
-                    <Typography
-                        variant='h6'
-                        fontWeight="600"
-                        fontFamily="Raleway"
+                    <Box sx={{
+                        color: ' rgb(245 245 245)',
+                        maxWidth: "100%",
+                        display: "flex",
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: "flex-end"
+                    }}>
+                        <Typography
+                            variant='h6'
+                            fontWeight="600"
+                            fontFamily="Raleway"
+                            sx={{
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                display: "-webkit-box",
+                                WebkitLineClamp: "5",
+                                WebkitBoxOrient: "vertical",
+                                width: "700px",
+                                fontSize: '16px'
+                            }}
+                        >{task !== undefined ? task : loadTask.task}</Typography>
+                        <Button variant='text'
+                            size="small"
+                            sx={{
+                                m: 0,
+                                p: 0,
+                                color: "rgb(115 115 115)",
+                                fontFamily: "Raleway",
+                                fontWeight: "600",
+                                "&:hover": {
+                                    background: "rgba(82, 82, 82, 0.2)",
+                                }
+                            }}>
+                            Edit Title
+                        </Button>
+                        <IconButton
+                            aria-label="close"
+                            onClick={onClose}
+                            sx={{
+                                position: 'absolute',
+                                right: 10,
+                                top: 10,
+                                color: 'rgb(229 229 229)',
+                            }}
+                        >
+                            <Cross1Icon />
+                        </IconButton>
+                    </Box>
+                    <Stack
+                        direction="row"
+                        spacing={1}
                         sx={{
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            display: "-webkit-box",
-                            WebkitLineClamp: "5",
-                            WebkitBoxOrient: "vertical",
-                            width: "700px",
-                            fontSize: '16px'
-                        }}
-                    >{task !== undefined ? task : loadTask.task}</Typography>
-                    <Button variant='text'
-                        size="small"
-                        sx={{
-                            m: 0,
-                            p: 0,
-                            color: "rgb(115 115 115)",
-                            fontFamily: "Raleway",
-                            fontWeight: "600",
-                            "&:hover": {
-                                background: "rgba(82, 82, 82, 0.2)",
-                            }
-                        }}>
-                        Edit Title
-                    </Button>
-                    <IconButton
-                        aria-label="close"
-                        onClick={onClose}
-                        sx={{
-                            position: 'absolute',
-                            right: 10,
-                            top: 10,
-                            color: 'rgb(229 229 229)',
+                            mt: 2
                         }}
                     >
-                        <Cross1Icon />
-                    </IconButton>
-
+                        {labels.map((label, index) => (
+                            <Chip
+                                key={index}
+                                label={label.label}
+                                size='small'
+                                sx={{
+                                    fontSize: "12px",
+                                    border: `1px solid rgb(${label.color})`,
+                                    backgroundColor: `rgba(${label.color.replace(/['"]+/g, '')}, 1)`,
+                                    width: "min-content",
+                                    position: "relative",
+                                    "&:hover": {
+                                        backgroundColor: `rgba(${label.color.replace(/['"]+/g, '')}, 1)`,
+                                    },
+                                }}
+                            />
+                        ))}
+                    </Stack>
                 </Box>
                 <Divider sx={{ background: "rgb(82 82 82)" }} />
                 <Box sx={{

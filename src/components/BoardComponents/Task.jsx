@@ -15,6 +15,7 @@ export default function Task({
     task, 
     status, 
     number, 
+    labels,
     handleRemoveTask,
     associatedColumn,
     handleTaskUpdate
@@ -152,13 +153,25 @@ export default function Task({
                             flexWrap: "wrap",
                             mt: 1
                         }}>
-                            <Chip
-                                label="Chip Filled"
+                            {labels.map((label, key) => (
+                                <Chip
+                                key={key}
+                                label={label.label}
                                 size='small'
                                 sx={{
                                     fontSize: "12px",
-                                }}
-                            />
+                                    border: `1px solid rgb(${label.color})`,
+                                    backgroundColor: `rgba(${label.color.replace(/['"]+/g, '')}, 1)`,
+                                    width: "min-content",
+                                    position: "relative",
+                                    mr: 1,
+                                    mt: 1,
+                                    "&:hover": {
+                                      backgroundColor: `rgba(${label.color.replace(/['"]+/g, '')}, 1)`,
+                                    },
+                                  }}
+                                />
+                            ))}
                         </Box>
                     </Box>
                 )}
@@ -174,6 +187,7 @@ export default function Task({
                 open={openTaskPanel}
                 onClose={() => handleTaskClose()}
                 task={task}
+                labels={labels}
             />}
             {openEditTask && <AddTaskForm
                 open={openEditTask}
@@ -182,6 +196,7 @@ export default function Task({
                 currentTask={task}
                 columnName={associatedColumn}
                 handleTaskUpdate={handleTaskUpdate}
+                labels={labels}
             />}
         </>
     )

@@ -14,11 +14,13 @@ export default function Column({
     index,
     data,
     columnName,
+    labels,
     handleAddTask,
     handleRemoveColumn,
     handleRemoveTask,
     handleColumnUpdate,
     handleTaskUpdate,
+
 }) 
 {
     const [addTask, setAddTask] = useState(false)
@@ -51,9 +53,11 @@ export default function Column({
                             borderRadius: '4px',
                             border: "1px solid rgb(64 64 64)",
                             m: 1,
-                            width: "100%",
                             minWidth: "300px",
-                            maxWidth: "300px",
+                            maxWidth: {
+                                xs: "100%",
+                                md: "300px",
+                            },
                             backgroundColor: theme.palette.currentTheme === "dark" ? "rgb(17 17 17)" : "rgb(229 231 235)",
                             position: "relative",
                         }}>
@@ -158,6 +162,7 @@ export default function Column({
                                             key={task.id}
                                             id={task.id}
                                             task={task.task}
+                                            labels={task.labels}
                                             index={index}
                                             handleRemoveTask={() => handleRemoveTask(columnName, task.id)}
                                             associatedColumn={columnName}
@@ -187,7 +192,7 @@ export default function Column({
                                     width: "100%",
                                     justifyContent: "flex-start",
                                     "&:hover": {
-                                        backgroundColor: "rgb(34 34 34)"
+                                        backgroundColor: theme.palette.currentTheme === "dark" ? "rgb(34 34 34)" : "rgb(209 213 219)",
                                     },
                                     fontFamily: "Poppins",
                                 }}
@@ -204,6 +209,7 @@ export default function Column({
                 onClose={() => setAddTask(!addTask)} 
                 handleAddTask={handleAddTask}
                 columnName={columnName}
+                labels={labels}
             />}
             {openPopover && <ColumnPopover 
                 open={openPopover}

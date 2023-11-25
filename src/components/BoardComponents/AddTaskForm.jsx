@@ -3,20 +3,17 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   Box,
-  Typography,
   IconButton,
   Button,
   Input,
   FormControl,
   FormLabel,
-  RadioGroup,
-  FormControlLabel,
+  Chip,
   Stack
 } from '@mui/material'
-import { Cross1Icon } from '@radix-ui/react-icons'
+import { Cross1Icon, PlusCircledIcon } from '@radix-ui/react-icons'
 
 export default function AddTaskForm({ 
   open, 
@@ -25,21 +22,35 @@ export default function AddTaskForm({
   columnName, 
   mode,
   currentTask,
-  handleTaskUpdate
+  handleTaskUpdate,
+  labels
 }) {
   const [task, setTask] = useState('')
-  const [description, setDescription] = useState('')
+  const [addLabels, setAddLabels] = useState([])
 
   const handleSubmit = () => {
     if(mode === "edit") { 
-      handleTaskUpdate(task, currentTask, description, columnName)
+      handleTaskUpdate(task, currentTask, addLabels, columnName)
       onClose()
     }
     else {
       if(!task.trim()) alert('name cannot be empty')
-      handleAddTask(task, description, columnName) 
+      handleAddTask(task, addLabels, columnName) 
       onClose()
     }
+  }
+
+  const handleAddLabel = (label) => {
+    if(!addLabels.some((addedLabel) => addedLabel.label_uid === label.label_uid)) {
+      addLabels.push(label)
+    }
+    else{
+      addLabels.pop(label)
+    }
+  }
+
+  const handleClick = () => {
+
   }
 
   return (
@@ -51,7 +62,6 @@ export default function AddTaskForm({
           ".MuiDialog-paper": {
             background: 'rgb(17 17 17)',
             border: "1px solid rgb(64 64 64)",
-            m: 1,
           }
         }}
       >
@@ -59,7 +69,8 @@ export default function AddTaskForm({
           <DialogTitle sx={{
             color: 'white',
             fontWeight: "500",
-            fontSize: "1rem"
+            fontSize: "1rem",
+            fontFamily: "Poppins",
           }}>
             {mode === 'edit' ? `Edit Item for ${columnName}` : `New Item for ${columnName}`}
           </DialogTitle>
@@ -81,7 +92,8 @@ export default function AddTaskForm({
             display: 'flex',
             flexDirection: "column",
             alignItems: "center",
-            justifyContent: 'center'
+            justifyContent: 'center',
+            maxWidth: "300px"
           }}>
 
             <form>
@@ -134,7 +146,48 @@ export default function AddTaskForm({
                       color: "white"
                     },
                     mt: 1,
+                    mb: 1,
                   }}>Labels: </FormLabel>
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    flexWrap="wrap"
+                  >
+                    {labels.map((label, index) => (
+                      <Chip
+                        key={index}
+                        label={label.label}
+                        size='small'
+                        sx={{
+                          fontSize: "12px",
+                          border: `1px solid rgb(${label.color})`,
+                          backgroundColor: 
+                            addLabels.map(currentLabels => currentLabels.label_uid).includes(label.label_uid) ? 
+                            `rgba(${label.color.replace(/['"]+/g, '')}, 1)` : "none",
+                          width: "min-content",
+                          "&:hover": {
+                            backgroundColor: `rgba(${label.color.replace(/['"]+/g, '')}, 0.25)`,
+                          },
+                        }}
+                        onClick={() => handleAddLabel(label)}
+                      />
+                    ))}
+                    <Chip
+                      label="Add Label"
+                      size='small'
+                      sx={{
+                        fontSize: "12px",
+                        background: 'rgb(38 38 38)',
+                        width: "min-content",
+                        position: "relative",
+                        "&:hover": {
+                          background: 'rgb(64 64 64)',
+                        },
+                      }}
+                      onClick={() => handleClick()}
+                      icon={<PlusCircledIcon />}
+                    />
+                  </Stack>
                 </FormControl>
               </Box>
             </form>
