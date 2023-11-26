@@ -59,6 +59,9 @@ export default function DeleteItem({open, onClose, handleRemoveTask}) {
           autoFocus
           onClick={onClose}
           size="small"
+          sx={{
+            background: "rgb(64 64 64)",
+          }}
         >
           Cancel
         </Button>
@@ -73,7 +76,7 @@ export default function DeleteItem({open, onClose, handleRemoveTask}) {
             color: "rgb(220 38 38)",
             "&:hover": {
               background: "rgb(220 38 38)",
-              color: "rgb(64 64 64)",
+              color: "white",
             }
           }}
         >

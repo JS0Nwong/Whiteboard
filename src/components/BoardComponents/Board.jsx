@@ -204,7 +204,7 @@ export default function Board({ columns, id, orderBy, labels }) {
                             ref={provided.innerRef}
                             sx={{
                                 height: '100%',
-                                maxHeight: {xs:"83%", md: "86%"},
+                                maxHeight: {xs:"86%", md: "86%"},
                                 display: "flex",
                                 flexDirection: {
                                     xs:"column",

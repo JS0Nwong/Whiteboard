@@ -72,7 +72,10 @@ export default function Task({
                             borderRadius: "4px",
                             p: 1,
                             mt: 1,
-                            mr: 1,
+                            mr: {
+                                xs: 0,
+                                md: 1,
+                            },
                             "&:first-of-type": {
                                 mt: 0
                             },

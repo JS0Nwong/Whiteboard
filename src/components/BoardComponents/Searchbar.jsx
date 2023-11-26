@@ -3,11 +3,14 @@ import { Box, Input, InputAdornment } from '@mui/material'
 import useDebounce from '../../utils/useDebounce'
 import useStore from '../../store'
 import SortIcon from '@mui/icons-material/Sort';
+import { useSearchParams } from 'react-router-dom'
 
 import useSearch from '../../utils/useSearch';
 
 export default function Searchbar({setFilteredData}) {
+    // get board data from global state store
     const { data } = useStore()
+    const [searchParams, setSearchParams] = useSearchParams()
 
     const [search, setSearch] = useState('') 
     // get user search query from search bar
@@ -28,56 +31,98 @@ export default function Searchbar({setFilteredData}) {
     const clearSearch = () => {
         setSearchResult(null)
         setFilteredData(null)
+        if(searchParams.has('filterType') || searchParams.has('filterQuery')) {
+            searchParams.delete('filterType')
+            searchParams.delete('filterQuery')
+            setSearchParams(searchParams)
+        }
+    }
+
+    const getFilters = (search) => {
+        if (search.match(/[:]/g)) {
+            search.split(":")
+            setFilter(search.split(":")[0])
+            setQuery(search.split(":")[1])
+
+            filter.toLowerCase() == "task" ? 
+            filterTasks(query) : filterLabels(query)
+        }
+        else {
+            filterAll(search)
+        }
+    }
+
+    const filterTasks = (query) => {
+        var dataClone = structuredClone(clone)
+        for (const keys in dataClone) {
+            Object.assign(dataClone, {
+                [keys]: {
+                    ...dataClone[keys],
+                    tasks: dataClone[keys].tasks.filter(
+                        (task) => task.task.toLowerCase().includes(query.toLowerCase())
+                    )
+                }
+            })[dataClone]
+        }
+        setFilteredData(dataClone)
+        setSearchParams({
+            filterType: filter,
+            filterQuery: query
+        })
+    }
+
+    function filterLabels(query) {
+        const dataClone = structuredClone(clone)
+        for (const key in dataClone) {
+            Object.assign(dataClone, {
+                [key]: {
+                    ...dataClone[key],
+                    tasks: dataClone[key].tasks.filter((task) =>
+                        task.labels.some(
+                            (label) => label.label.toLowerCase().includes(query.toLowerCase())
+                        ))
+                }
+            })[dataClone]
+        }
+        setFilteredData(dataClone)
+        setSearchParams({
+            filterType: filter,
+            filterQuery: query
+        })
+    }
+
+    function filterAll(query) {
+        const dataClone = structuredClone(clone)
+        for (const key in dataClone) {
+            Object.assign(dataClone, {
+                [key]: {
+                    ...dataClone[key],
+                    tasks: dataClone[key].tasks.filter((task) => {
+                        // task.task.toLowerCase().includes(query.toLowerCase())
+                        // task.labels.some(
+                        //     (label) => label.label.toLowerCase().includes(query.toLowerCase())
+                        // )
+                    })
+                }
+            })[dataClone]
+        }
+        setFilteredData(dataClone)
+        setSearchParams({
+            filterQuery: query
+        })
     }
     
-    // useEffect(() => {
-    //     search.trim() === '' ? clearSearch() : setFilteredData(searchResult)
-    // }, [data, search, setFilteredData])
+    useEffect(() => {
+        query.trim() || search.trim() === '' ? clearSearch() : setFilteredData(searchResult)
+    }, [data, search, setFilteredData])
 
-    useDebounce(() => {
-        function getFilters(search) {
-            if (search.match(/[:]/g)) {
-                search.split(":")
-                setFilter(search.split(":")[0])
-                setQuery(search.split(":")[1])
+    useEffect(() => {
+        search !== "" ? getFilters(search) : setFilteredData(null)
+    }, [search])
 
-                filter.toLowerCase() == "task" ? 
-                filterTasks(query) : filterLabels(query)
-            }
-            else {
-                filterAll(search)
-            }
-        }
-        getFilters(search)
-
-        function filterTasks(query) {
-            var dataClone = structuredClone(clone)
-            for (const keys in dataClone) {
-                Object.assign(dataClone, {
-                    [keys]: {
-                        ...dataClone[keys],
-                        tasks: dataClone[keys].tasks.filter((task) => task.task.toLowerCase().includes(query.toLowerCase()))
-                    }
-                })[dataClone]
-                setFilteredData(dataClone)
-            }
-        }
-
-        function filterLabels(query) {
-            // for(const key in data) {
-            //     console.log(
-            //         data[key].tasks.filter((label) => 
-            //         label.labels.filter(
-            //             (label) => label.label.toLowerCase() === query.toLowerCase()
-            //         ))
-            //     )
-            // }
-        }
-
-        function filterAll(search) {
-
-        }
-    }, [clone, search], 800)
+    // useDebounce(() => {
+    //    getFilters(search)
+    // }, [clone, search], 800)
 
     return (
         <Box sx={{
@@ -104,7 +149,7 @@ export default function Searchbar({setFilteredData}) {
                         "&.Mui-focused ": {
                             border: "1px solid #aaa"
                         }
-                    }
+                    },
                 }}
                 autoComplete="off"
                 onChange={(e) => setSearch(e.target.value)}
