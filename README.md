@@ -21,6 +21,7 @@ This is a Kanban board application, a tool used in project management to help vi
 - **Kanban Board:** Organize your tasks into customizable columns.
 - **Drag-and-Drop:** Easily move tasks between columns with a smooth drag-and-drop interface.
 - **Realtime Updates:** Changes to the board are reflected in real-time thanks to Firebase.
+- **Searching & Filtering** Easily search and find tasks by task details or labels.
 
 ## Installation
 
