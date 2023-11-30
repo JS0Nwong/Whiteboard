@@ -11,7 +11,8 @@ import {
   orderBy,
   getDoc,
   setDoc,
-  onSnapshot
+  onSnapshot,
+  arrayUnion
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { getAuth } from "firebase/auth";
@@ -97,6 +98,18 @@ const useFirebaseHooks = () => {
     }
   };
 
+  const updateLabels = async(id, label) => {
+    const docRef = doc(db, `users/${uid}/boardsData/${id}`)
+    try {
+      await updateDoc(docRef, {
+        labels: arrayUnion(label)
+      })
+    }
+    catch(error) {
+      throw error
+    }
+  }
+
   const updateBoard = async(id, tasks) => {
     const docRef = doc(db, `users/${uid}/boardsData/${id}`)
     try {
@@ -125,7 +138,15 @@ const useFirebaseHooks = () => {
   };
 
 
-  return { createBoard, deleteBoard, getBoard, getBoards, updateBoard, updateColumnKeys };
+  return {
+    createBoard,
+    deleteBoard,
+    getBoard,
+    getBoards,
+    updateBoard,
+    updateColumnKeys,
+    updateLabels,
+  };
 };
 
 export default useFirebaseHooks;

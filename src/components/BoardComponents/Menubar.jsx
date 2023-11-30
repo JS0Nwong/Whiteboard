@@ -62,7 +62,7 @@ export default function Menubar({ data, setToggleListView }) {
                 </Box>
                 <Box
                     sx={{
-                        display: "flex",
+                        display: {xs: "none", md: "flex"},
                         flexDirection: "row"
                     }}
                 >

@@ -81,6 +81,9 @@ function App() {
           }
         })
     },
+    typography: {
+      fontFamily: "Poppins"
+    },
     borders: {
       currentTheme,
       ...(currentTheme === 'light' ? {

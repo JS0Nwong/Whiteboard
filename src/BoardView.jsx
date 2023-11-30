@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import Board from './components/BoardComponents/Board'
 import Menubar from './components/BoardComponents/Menubar'
+import Searchbar from './components/BoardComponents/Searchbar'
 import List from './components/BoardComponents/List'
 
 import {
@@ -24,6 +25,7 @@ export default function BoardView() {
     const [loading, setLoading] = useState(true)
     const [listData, setListData] = useState(null)
     const [toggleListView, setToggleListView] = useState(false)
+    const [labels, setLabels] = useState(null)
     // get current user
     const {
         currentUser: { uid },
@@ -32,8 +34,7 @@ export default function BoardView() {
     // Gets board id from URL params
     const { id } = useParams();
 
-    const { getBoard, deleteBoard } = useFirebaseHooks()
-    const { boards, areBoardsFetched } = useStore()
+    const { boards, areBoardsFetched, setData } = useStore()
 
     // Gets boards from global state and filters to find the selected board 
     const board = useMemo(() => boards.find((board) => board.id === id), [])
@@ -42,13 +43,15 @@ export default function BoardView() {
     useEffect(() => {
         const docRef = doc(db, `users/${uid}/boardsData/${id}`)
         onSnapshot(docRef, (doc) => {
-            const { columns, lastUpdated, orderBy } = doc.data()
+            const { columns, lastUpdated, orderBy, labels } = doc.data()
 
             setBoardData(columns);
             setOrderBy(orderBy)
+            setLabels(labels)
             //   setLastUpdated(lastUpdated.toDate().toLocaleString("en-US"));
             setLoading(false)
 
+            setData(columns)
             const rows = []
 
             orderBy.map((key, index) => {
@@ -63,9 +66,6 @@ export default function BoardView() {
             })
             setListData(rows)
         })
-
-        console.log(toggleListView)
-
     }, [])
 
     if (!board) return null
@@ -90,6 +90,7 @@ export default function BoardView() {
                         data={listData}
                         orderBy={orderBy}
                         id={id}
+                        labels={labels}
                     />
                     :
                     <Board
@@ -97,6 +98,7 @@ export default function BoardView() {
                         orderBy={orderBy}
                         id={id}
                         lastUpdated={lastUpdated}
+                        labels={labels}
                     />
                 }
             </div>

@@ -3,7 +3,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   Box,
   Typography,
@@ -12,13 +11,8 @@ import {
   Input,
   FormControl,
   FormLabel,
-  RadioGroup,
-  FormControlLabel,
-  Stack
 } from '@mui/material'
 import { Cross1Icon } from '@radix-ui/react-icons'
-
-import useFirebaseHooks from '../../utils/firebaseHooks'
 
 const colors = [
   '52, 58, 64',
@@ -31,22 +25,17 @@ const colors = [
   '255, 112, 166',
 ]
 
-export default function CreateBoardForm({ open, onClose }) {
-  const [boardName, setBoardName] = useState('')
-  const [description, setDescription] = useState('')
+export default function AddColumnForm({
+  open,
+  onClose,
+  handleAddLabel
+}) {
+  const [label, setLabel] = useState('')
   const [currentColor, setColor] = useState('52, 58, 64')
 
-  const { createBoard } = useFirebaseHooks()
-
-  const handleSubmit = async() => {
-    if(!boardName.trim()) return
-    try {
-      await createBoard({name: boardName, color: currentColor, description: description})
-      onClose()
-    }
-    catch (error) {
-      console.log(error)
-    }
+  const handleSubmit = () => {
+    handleAddLabel(label, currentColor, crypto.randomUUID())
+    onClose()
   }
 
   return (
@@ -64,9 +53,10 @@ export default function CreateBoardForm({ open, onClose }) {
       <DialogTitle sx={{
         color: 'white',
         fontWeight: "500",
-        fontSize: "1rem"
+        fontSize: "1rem",
+        fontFamily: "Poppins"
       }}>
-        New Board
+        Add Label
       </DialogTitle>
 
       <IconButton
@@ -86,7 +76,7 @@ export default function CreateBoardForm({ open, onClose }) {
         display: 'flex',
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: 'center'
+        justifyContent: 'center',
       }}>
         <Box sx={{
           backgroundColor: `rgba(${currentColor.replace(/['"]+/g, '')}, 0.15)`,
@@ -102,6 +92,7 @@ export default function CreateBoardForm({ open, onClose }) {
           justifyContent: 'center',
           textOverflow: "ellipsis",
           overflow: 'hidden',
+          
           "&:before": {
             opacity: "0.4"
           }
@@ -116,11 +107,9 @@ export default function CreateBoardForm({ open, onClose }) {
               opacity: "",
               maxWidth: "220px"
             }}
-          >{boardName}</Typography>
+          >{label}</Typography>
         </Box>
-
-        {/* Create board form (Color, Name, Description Inputs) */}
-        <form>
+        <form >
           <Box sx={{
             display: 'flex',
             flexDirection: "column"
@@ -128,7 +117,8 @@ export default function CreateBoardForm({ open, onClose }) {
             <FormControl required>
               <FormLabel sx={{
                 "&.MuiFormLabel-root": {
-                  color: "white"
+                  color: "white",
+                  fontFamily: "Poppins"
                 },
                 ".Mui-focused": {
                   color: "white"
@@ -136,7 +126,9 @@ export default function CreateBoardForm({ open, onClose }) {
                 ".MuiFormLabel-asterisk": {
                   color: "red"
                 }
-              }}>Color: </FormLabel>
+              }}
+              label="color"
+              >Color: </FormLabel>
               <Box sx={{
                 display: "flex",
                 flexDirection: 'row',
@@ -150,6 +142,8 @@ export default function CreateBoardForm({ open, onClose }) {
                       height: "30px",
                       width: "25px",
                       borderRadius: "2px",
+                      outline: currentColor === color? "2px solid rgb(255, 255, 255)" : "none",
+                      outlineOffset: "2px",
                       m: 0.5,
                       "&:hover": {
                         backgroundColor: `rgb(${color})`,
@@ -157,25 +151,24 @@ export default function CreateBoardForm({ open, onClose }) {
                       "&:first-of-type": {
                         ml: 0,
                       },
-                      "&:last-child": {
+                      "&:last-of-type": {
                         mr: 0,
-                      },
-                      outline: currentColor === color ? "2px solid rgb(255, 255, 255)" : "none",
-                      outlineOffset: "2px"
+                      }
                     }}
                     onClick={() => setColor(color)}
                   >
+                    
                   </IconButton>
                 ))}
               </Box>
 
             </FormControl>
 
-            {/* Name */}
             <FormControl required>
               <FormLabel sx={{
                 "&.MuiFormLabel-root": {
-                  color: "white"
+                  color: "white",
+                  fontFamily: "Poppins"
                 },
                 ".Mui-focused": {
                   color: "white"
@@ -184,51 +177,19 @@ export default function CreateBoardForm({ open, onClose }) {
                   color: "red"
                 },
                 mt: 1,
-              }}>Name: </FormLabel>
+              }}>Label: </FormLabel>
               <Input
-                name='board-name'
-                placeholder="Name"
+                placeholder={"Label"}
                 disableUnderline
                 sx={{
                   color: "#FFFFFF",
                   pl: 1,
                   pr: 1,
+                  pb: 0.5,
+                  pt: 0.5,
                   overflow: "visible",
-                  fontWeight: "500",
-                  border: "1px solid #555",
-                  borderRadius: "4px",
-                  "&.MuiInputBase-root ": {
-                    "&.Mui-focused ": {
-                      border: "1px solid #aaa"
-                    }
-                  },
-                  mb: 2,
-                }}
-                autoComplete="off"
-                onChange={(e) => setBoardName(e.target.value)}
-              />
-            </FormControl>
-
-            <FormControl>
-              <FormLabel sx={{
-                "&.MuiFormLabel-root": {
-                  color: "white"
-                },
-                ".Mui-focused": {
-                  color: "white"
-                },
-                mt: 1,
-              }}>Description: </FormLabel>
-              <Input
-                name="description"
-                placeholder="Description"
-                disableUnderline
-                sx={{
-                  color: "#FFFFFF",
-                  pl: 1,
-                  pr: 1,
-                  overflow: "visible",
-                  fontWeight: "500",
+                  fontFamily: "Poppins",
+                  fontWeight: "400",
                   border: "1px solid #555",
                   borderRadius: "4px",
                   "&.MuiInputBase-root ": {
@@ -238,7 +199,7 @@ export default function CreateBoardForm({ open, onClose }) {
                   }
                 }}
                 autoComplete="off"
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) => setLabel(e.target.value)}
               />
             </FormControl>
           </Box>
@@ -258,6 +219,7 @@ export default function CreateBoardForm({ open, onClose }) {
         <Button
           variant='contained'
           autoFocus
+          onClick={() => handleSubmit()}
           size="small"
           sx={{
             m: 2,
@@ -267,9 +229,8 @@ export default function CreateBoardForm({ open, onClose }) {
               background: "white",
             }
           }}
-          onClick={handleSubmit}
         >
-          Save
+          Add
         </Button>
       </DialogActions>
     </Dialog>

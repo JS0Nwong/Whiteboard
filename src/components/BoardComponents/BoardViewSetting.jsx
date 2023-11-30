@@ -46,7 +46,6 @@ export default function BoardViewSetting() {
         id="demo-multiple-checkbox"
         value={personName}
         onChange={handleChange}
-        renderValue={(selected) => selected.join(', ')}
         sx={{
           "&:label": {
             color: "#fff"
