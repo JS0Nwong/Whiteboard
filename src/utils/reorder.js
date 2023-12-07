@@ -9,7 +9,6 @@ const useReorder = () => {
 
     // reordering tasks 
     const reorderMap = ({tasks, source, destination}) => {
-
         const current = [...tasks[source.droppableId].tasks]
         const next = [...tasks[destination.droppableId].tasks]
         const target = current[source.index]

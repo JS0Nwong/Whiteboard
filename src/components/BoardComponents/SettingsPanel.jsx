@@ -131,6 +131,7 @@ export default function SettingsPanel({ open, onClose, anchor }) {
               Add Labels
             </Button>
           </Box>
+          
         </Box>
 
         <Box sx={{

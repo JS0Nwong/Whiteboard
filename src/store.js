@@ -8,6 +8,9 @@ const store = (set) => ({
   areBoardsFetched: false,
   data: null,
   filtered: null,
+  publiclyEditable: false,
+  publiclyViewable: false,
+  currentBoard: null,
   addBoard: (board) =>
     set(
       (old) => ({
@@ -15,6 +18,18 @@ const store = (set) => ({
       }),
       false,
       "addBoards"
+    ),
+  setPubliclyViewable: (boolean) =>
+    set({ publiclyViewable: boolean }, false, "setPubliclyViewable"),
+  setPubliclyEditable: (boolean) =>
+    set({ publiclyEditable: boolean }, false, "setPubliclyEditable"),
+  setCurrentBoard: (boardId) =>
+    set(
+      {
+        currentBoard: boardId,
+      },
+      false,
+      "setCurrentBoard"
     ),
   setBoards: (boards) =>
     set(
@@ -35,20 +50,18 @@ const store = (set) => ({
       false,
       "setAuth"
     ),
-  setData: (data) => 
-      set(
-        {
-          data: data,
-        },
-        false,
-        "setData"
-      ),
-  setFiltered: (data) => 
-      set(
-        {
-          filtered: data
-        }
-      )
+  setData: (data) =>
+    set(
+      {
+        data: data,
+      },
+      false,
+      "setData"
+    ),
+  setFiltered: (data) =>
+    set({
+      filtered: data,
+    }),
 });
 
 const useStore = create(devtools(store));

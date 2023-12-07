@@ -20,7 +20,6 @@ export default function Column({
     handleRemoveTask,
     handleColumnUpdate,
     handleTaskUpdate,
-
 }) 
 {
     const [addTask, setAddTask] = useState(false)
@@ -103,6 +102,13 @@ export default function Column({
                                         sx={{
                                             ml: 1,
                                             color: "rgb(115 115 115)",
+                                            background: "rgb(38 38 38)",
+                                            borderRadius: "99px",
+                                            width: "1.3rem",
+                                            height: "1.3rem",
+                                            display: 'flex',
+                                            alignItems: "center",
+                                            justifyContent: 'center',
                                         }}
                                     >
                                         {data.tasks.length}

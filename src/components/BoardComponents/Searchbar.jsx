@@ -5,19 +5,19 @@ import useStore from '../../store'
 import SortIcon from '@mui/icons-material/Sort';
 import { useSearchParams } from 'react-router-dom'
 
-import useSearch from '../../utils/useSearch';
+import useFilter from '../../utils/useFilter';
 
-export default function Searchbar({setFilteredData}) {
-    // get board data from global state store
+export default function Searchbar({ setFilteredData }) {
+
+    const {filterTasks, filterLabels, filterAll} = useFilter()
+
     const { data } = useStore()
+    // get board data from global state store
+    
     const [searchParams, setSearchParams] = useSearchParams()
 
-    const [search, setSearch] = useState('') 
+    const [search, setSearch] = useState('')
     // get user search query from search bar
-
-    const [clone, setDataClone] = useState(structuredClone(data)) 
-    // don't want to directly manipulate data from database so we create 
-    // a clone of it after getting it in global state
 
     const [searchResult, setSearchResult] = useState(null)
     // set search result after searching
@@ -44,76 +44,16 @@ export default function Searchbar({setFilteredData}) {
             setFilter(search.split(":")[0])
             setQuery(search.split(":")[1])
 
-            filter.toLowerCase() == "task" ? 
-            filterTasks(query) : filterLabels(query)
+            filter.toLowerCase() === "task" ? 
+            filterTasks(filter, query, data, setFilteredData) : filterLabels(filter, query, data, setFilteredData)
         }
         else {
-            filterAll(search)
+            filterAll(search, data, setFilteredData)
         }
-    }
-
-    const filterTasks = (query) => {
-        var dataClone = structuredClone(clone)
-        for (const keys in dataClone) {
-            Object.assign(dataClone, {
-                [keys]: {
-                    ...dataClone[keys],
-                    tasks: dataClone[keys].tasks.filter(
-                        (task) => task.task.toLowerCase().includes(query.toLowerCase())
-                    )
-                }
-            })[dataClone]
-        }
-        setFilteredData(dataClone)
-        setSearchParams({
-            filterType: filter,
-            filterQuery: query
-        })
-    }
-
-    function filterLabels(query) {
-        const dataClone = structuredClone(clone)
-        for (const key in dataClone) {
-            Object.assign(dataClone, {
-                [key]: {
-                    ...dataClone[key],
-                    tasks: dataClone[key].tasks.filter((task) =>
-                        task.labels.some(
-                            (label) => label.label.toLowerCase().includes(query.toLowerCase())
-                        ))
-                }
-            })[dataClone]
-        }
-        setFilteredData(dataClone)
-        setSearchParams({
-            filterType: filter,
-            filterQuery: query
-        })
-    }
-
-    function filterAll(query) {
-        const dataClone = structuredClone(clone)
-        for (const key in dataClone) {
-            Object.assign(dataClone, {
-                [key]: {
-                    ...dataClone[key],
-                    tasks: dataClone[key].tasks.filter((task) => {
-                        // task.task.toLowerCase().includes(query.toLowerCase())
-                        // task.labels.some(
-                        //     (label) => label.label.toLowerCase().includes(query.toLowerCase())
-                        // )
-                    })
-                }
-            })[dataClone]
-        }
-        setFilteredData(dataClone)
-        setSearchParams({
-            filterQuery: query
-        })
     }
     
     useEffect(() => {
-        query.trim() || search.trim() === '' ? clearSearch() : setFilteredData(searchResult)
+        query.trim() !== "" || search.trim() === '' ? clearSearch() : setFilteredData(searchResult)
     }, [data, search, setFilteredData])
 
     useEffect(() => {
@@ -121,8 +61,9 @@ export default function Searchbar({setFilteredData}) {
     }, [search])
 
     // useDebounce(() => {
-    //    getFilters(search)
-    // }, [clone, search], 800)
+    //     search !== "" ? getFilters(search) : setFilteredData(null)
+    // }, [data, search], 200)
+    
 
     return (
         <Box sx={{
@@ -132,6 +73,11 @@ export default function Searchbar({setFilteredData}) {
                 fullWidth
                 disableUnderline
                 placeholder={'Filter by keyword or fields'}
+                defaultValue={
+                    searchParams.has('filterType') && searchParams.has('filterQuery') ?
+                        `${searchParams.get('filterType')}:${searchParams.get('filterQuery')}` :
+                        searchParams.get('filterQuery')
+                }
                 startAdornment={
                     <InputAdornment position="start">
                       <SortIcon sx={{color: "#888"}}/>

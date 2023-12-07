@@ -1,7 +1,9 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
+import { useAuth } from "./AuthProvider";
 import useStore from "../store";
 
-export default function PrivateRoute({Component}) { 
+export default function PrivateRoute({ Component }) {
     const { isLoggedIn } = useStore();
-    return !isLoggedIn ? <Navigate to="/boards" replace /> : <Component />;
+    const { currentUser, isLoading } = useAuth()
+    return currentUser ? <Component /> : <Navigate to="/" replace/>
 }   

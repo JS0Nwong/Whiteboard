@@ -1,4 +1,4 @@
-// For async operations 
+// For async operations
 import {
   collection,
   addDoc,
@@ -12,21 +12,40 @@ import {
   getDoc,
   setDoc,
   onSnapshot,
-  arrayUnion
+  arrayUnion,
 } from "firebase/firestore";
-import { db } from "../firebase";
+import { auth, db } from "../firebase";
 import { getAuth } from "firebase/auth";
 import useStore from "../store";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const useFirebaseHooks = () => {
+  const { addBoard, boards, setBoards, setCurrentBoard } = useStore();
+
+  const getId = async() => {
+    const { id } = useParams();
+    const docRef = doc(db, `boardsMetadata/${id}`);
+    try {
+      const boardDoc = await getDoc(docRef).then((doc) => {
+        if (doc.exists) {
+          return doc.data().boardOwner;
+        } else {
+          return null;
+        }
+      })
+      setCurrentBoard(boardDoc);
+    } catch (error) {
+      console.log(error)
+    }
+  };
+
   const navigate = useNavigate();
-  const {
-    currentUser: { uid },
-  } = getAuth();
+  const uid = auth.currentUser !== null ? auth.currentUser.uid : getId()
+  const email = auth.currentUser !== null ? auth.currentUser.email : null
+
+  // const {currentUser: {uid, email}} = getAuth()
 
   const boardColRef = collection(db, `users/${uid}/boards`);
-  const { addBoard, boards, setBoards } = useStore()
 
   const createBoard = async ({ name, color, description }) => {
     try {
@@ -35,108 +54,154 @@ const useFirebaseHooks = () => {
         color,
         description,
         createdAt: serverTimestamp(),
-      })
+        isPubliclyViewable: false,
+        isPubliclyEditable: false,
+        sharedToUsers: [
+          {
+            email: email,
+            canEdit: true,
+            canView: true,
+          },
+        ],
+        boardOwner: uid,
+      });
 
       addBoard({
-        name, 
+        name,
         color,
         description,
-        createdAt: new Date().toLocaleString('en-US'),
-        id: boardDoc.id
-      })
-    }
-    catch(error) {
-      console.log(error)
+        createdAt: new Date().toLocaleString("en-US"),
+        id: boardDoc.id,
+      });
+    } catch (error) {
+      console.log(error);
     }
   };
 
   const deleteBoard = async (id) => {
     try {
-      const docRef =  doc(db, `users/${uid}/boards/${id}`)
-      await deleteDoc(docRef)
+      const docRef = doc(db, `users/${uid}/boards/${id}`);
+      await deleteDoc(docRef);
 
       const tBoards = boards.filter((board) => board.id !== id);
       setBoards(tBoards);
+    } catch (error) {
+      throw error;
     }
-    catch (error) { 
-      throw error
-    }
-
   };
 
-  const getBoards = async(setLoading) => {
+  const getBoards = async (setLoading) => {
     try {
-      const q = query(boardColRef, orderBy('createdAt', 'desc'))
-      const querySnapshot = await getDocs(q)
+      const q = query(boardColRef, orderBy("createdAt", "desc"));
+      const querySnapshot = await getDocs(q);
       const boards = querySnapshot.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
-        createdAt: doc.data().createdAt.toDate().toLocaleString('en-US')
-      }))
+        createdAt: doc.data().createdAt.toDate().toLocaleString("en-US"),
+      }));
 
-      setBoards(boards)
-    }
-    catch(error) {
-      console.log(error)
-    }
-    finally {
-      if (setLoading) setLoading(false)
+      setBoards(boards);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (setLoading) setLoading(false);
     }
   };
 
-  const getBoard = async(id) => {
-    const docRef = doc(db, `users/${uid}/boardsData/${id}`)
+  const getBoard = async (id) => {
+    const docRef = doc(db, `users/${uid}/boardsData/${id}`);
     try {
-      const doc = await getDoc(docRef)
-      if(doc.exists) {
-        return doc.data()
-      }
-      else return null
-    }
-    catch(error) {
-      throw error
+      const doc = await getDoc(docRef);
+      if (doc.exists) {
+        return doc.data();
+      } else return null;
+    } catch (error) {
+      throw error;
     }
   };
 
-  const updateLabels = async(id, label) => {
-    const docRef = doc(db, `users/${uid}/boardsData/${id}`)
+  const updateLabels = async (id, label) => {
+    const docRef = doc(db, `users/${uid}/boardsData/${id}`);
     try {
       await updateDoc(docRef, {
-        labels: arrayUnion(label)
-      })
+        labels: arrayUnion(label),
+      });
+    } catch (error) {
+      throw error;
     }
-    catch(error) {
-      throw error
-    }
-  }
+  };
 
-  const updateBoard = async(id, tasks) => {
-    const docRef = doc(db, `users/${uid}/boardsData/${id}`)
+  const updateBoard = async (id, tasks) => {
+    const docRef = doc(db, `users/${uid}/boardsData/${id}`);
     try {
       await updateDoc(docRef, {
         columns: {
-          ...tasks
-        }, 
+          ...tasks,
+        },
         lastUpdated: serverTimestamp(),
-      })
-    }
-    catch(error) {
-      throw error
+      });
+    } catch (error) {
+      throw error;
     }
   };
 
-  const updateColumnKeys = async(id, keys) => {
-    const docRef = doc(db, `users/${uid}/boardsData/${id}`)
+  const updateColumnKeys = async (id, keys) => {
+    const docRef = doc(db, `users/${uid}/boardsData/${id}`);
     try {
       await updateDoc(docRef, {
         orderBy: keys,
-      })
-    }
-    catch(error) {
-      throw error
+      });
+    } catch (error) {
+      throw error;
     }
   };
 
+  const updateUsers = async (id, users) => {
+    const docRef = doc(db, `users/${uid}/boards/${id}`);
+    try {
+      console.log(id, users);
+      // await updateDoc(docRef, {
+      //   sharedToUsers: {
+      //     ...users
+      //   }
+      // })
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const updateBoardEditPermissions = async (id, settings) => {
+    const docRef = doc(db, `users/${uid}/boards/${id}`);
+    const metadataDocRef = doc(db, `boardsMetadata/${id}`)
+    try {
+      await updateDoc(docRef, {
+        isPubliclyEditable: settings,
+        isPubliclyViewable: settings,
+      });
+      await updateDoc(metadataDocRef, {
+        isPubliclyEditable: settings,
+        isPubliclyViewable: settings,
+      });
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  
+  const updateBoardViewPermissions = async (id, settings) => {
+    const docRef = doc(db, `users/${uid}/boards/${id}`);
+    const metadataDocRef = doc(db, `boardsMetadata/${id}`)
+    try {
+      await updateDoc(docRef, {
+        isPubliclyViewable: settings,
+      });
+      await updateDoc(metadataDocRef, {
+        isPubliclyViewable: settings,
+      });
+    } catch (error) {
+      throw error;
+    }
+  };
 
   return {
     createBoard,
@@ -146,6 +211,11 @@ const useFirebaseHooks = () => {
     updateBoard,
     updateColumnKeys,
     updateLabels,
+    updateUsers,
+    updateBoardEditPermissions,
+    updateBoardViewPermissions,
+    uid,
+    email,
   };
 };
 

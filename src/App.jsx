@@ -1,6 +1,6 @@
 import { useMemo, useEffect, useState, useContext, createContext } from 'react'
 import './App.css'
-import {useTheme, createTheme, ThemeProvider, CssBaseline } from '@mui/material'
+import { useTheme, createTheme, ThemeProvider, CssBaseline } from '@mui/material'
 
 import { Routes, Route } from 'react-router-dom'
 
@@ -8,39 +8,33 @@ import LoginView from './LoginView'
 import BoardListView from './BoardListView'
 import BoardView from './BoardView'
 
-import { auth } from './firebase'
-import { onAuthStateChanged } from 'firebase/auth'
-
+import { AuthProvider } from './utils/AuthProvider'
 import PrivateRoute from "./utils/PrivateRoute"
 import PublicRoute from "./utils/PublicRoute"
 
 import useStore from './store'
 
-export const ThemeContext = createContext({toggleTheme: () => {}})
+export const ThemeContext = createContext({ toggleTheme: () => { } })
 const defaultTheme = "dark"
 
 function AppRoutes() {
-  const { isLoggedIn, setAuth } = useStore()
-
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      setAuth(user)
-    })
-
-    return () => unsub()
-  }, []);
-
+  // get view and edit permissions for board routes
+  const { publiclyEditable, publiclyViewable } = useStore()
   return (
     <>
-        <CssBaseline />
+      <CssBaseline />
+      <AuthProvider>
         <div className='App'>
           <Routes>
             <Route path="/" element={<PublicRoute Component={LoginView} />} />
             <Route path="/boards" element={<PrivateRoute Component={BoardListView} />} />
-            <Route path="/boards/:id" element={<PrivateRoute Component={BoardView} />} />
+            <Route path="/boards/:id" element={
+              publiclyViewable ? <PublicRoute Component={BoardView} /> : <PrivateRoute Component={BoardView} />
+            } />
             <Route path='*' element={<LoginView />} />
           </Routes>
         </div>
+      </AuthProvider>
     </>
   )
 }
@@ -82,16 +76,16 @@ function App() {
         })
     },
     typography: {
-      fontFamily: "Poppins"
+      fontFamily: "Poppins, sans-serif"
     },
     borders: {
       currentTheme,
       ...(currentTheme === 'light' ? {
         border: "1px solid rgb(64 64 64)"
-      } : 
+      } :
         {
           borderColor: 'orange'
-      }) 
+        })
     }
   }), [currentTheme])
 
