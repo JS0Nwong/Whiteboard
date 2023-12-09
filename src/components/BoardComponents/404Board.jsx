@@ -1,12 +1,15 @@
 import { useState } from 'react'
-import { Skeleton, Box, Dialog, DialogContent, Typography, useTheme } from '@mui/material'
+import { Skeleton, Box, Dialog, DialogContent, Typography, useTheme, IconButton } from '@mui/material'
+import { Cross1Icon } from '@radix-ui/react-icons'
+import { useNavigate } from 'react-router'
 
 export default function BoardError() {
     const [dialogOpen, setDialogOpen] = useState(true)
     const theme = useTheme()
+    const navigate = useNavigate()
 
     const handleClose = () => {
-
+        navigate('/boards')
     }
 
     return (
@@ -50,6 +53,19 @@ export default function BoardError() {
                     background: 'rgba(104, 104, 104, 0.25)'
                 }}
             >
+                 <IconButton
+                    aria-label="close"
+                    onClick={handleClose}
+                    sx={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8,
+                        color: (theme) => theme.palette.grey[500],
+                    }}
+                >
+                    <Cross1Icon />
+                </IconButton>
+
                 <DialogContent>
                     <Typography>
                         Sorry, but you do not have permission to view this board.

@@ -13,10 +13,12 @@ import TaskViewSetting from './TaskViewSetting';
 import AddLabelsForm from "./AddLabelsForm";
 import { getAuth, signOut } from "firebase/auth";
 import useFirebaseHooks from '../../utils/firebaseHooks'
+import useStore from '../../store';
 
 export default function SettingsPanel({ open, onClose, anchor }) {
   const { id } = useParams();
   const { updateLabels } = useFirebaseHooks()
+  const { setAuth } = useStore()
 
   const handleBoardUpdate = async (data) => {
     await updateLabels(id, data)
@@ -39,6 +41,7 @@ export default function SettingsPanel({ open, onClose, anchor }) {
   const handleSignout = () => {
     const auth = getAuth()
     auth.currentUser ? signOut(auth) : console.log("not signed into an account")
+    setAuth(false)
   }
 
   const [openLabel, setOpenLabels] = useState(false)
@@ -126,12 +129,12 @@ export default function SettingsPanel({ open, onClose, anchor }) {
                   fontSize: "12px"
                 },
               }}
-              onClick={() => setOpenLabels(!openLabel)} 
+              onClick={() => setOpenLabels(!openLabel)}
             >
               Add Labels
             </Button>
           </Box>
-          
+
         </Box>
 
         <Box sx={{
@@ -149,16 +152,16 @@ export default function SettingsPanel({ open, onClose, anchor }) {
                 backgroundColor: "rgba(220, 38, 38, 0.2)"
               }
             }}
-            onClick={() => handleSignout()} 
-            >
+            onClick={() => handleSignout()}
+          >
             Log out
           </Button>
         </Box>
       </Popover>
-      {openLabel && <AddLabelsForm 
-          open={openLabel}
-          onClose={() => setOpenLabels(!openLabel)}
-          handleAddLabel={handleAddLabel}
+      {openLabel && <AddLabelsForm
+        open={openLabel}
+        onClose={() => setOpenLabels(!openLabel)}
+        handleAddLabel={handleAddLabel}
       />}
     </>
   )

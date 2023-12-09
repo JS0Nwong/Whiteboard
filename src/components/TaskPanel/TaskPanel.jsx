@@ -20,7 +20,7 @@ import {
 import { db } from "../../firebase";
 import { getAuth } from "firebase/auth";
 
-export default function TaskPanel({ open, onClose, task, labels }) {
+export default function TaskPanel({ open, onClose, task, labels, description, dateAdded, }) {
     const [searchParams, setSearchParams] = useSearchParams()
     const [loadTask, setTask] = useState(null)
     const { id } = useParams();
@@ -37,14 +37,14 @@ export default function TaskPanel({ open, onClose, task, labels }) {
                 setTask(columns[searchParams.get('column')].tasks.find((task) => task.id == searchParams.get('task')))
             })
         }
-
+        console.log(searchParams.has('task'))
     }, [])
 
     return (
         <>
             <Drawer
                 anchor='right'
-                open={searchParams.has('task') || searchParams.has('column') == true ? true : open}
+                open={searchParams.has('task') || searchParams.has('column') === true ? true : open}
                 onClose={onClose}
                 sx={{
                     ".MuiDrawer-paper": {
@@ -65,59 +65,72 @@ export default function TaskPanel({ open, onClose, task, labels }) {
                     pb: 3,
                 }}>
                     <Box sx={{
-                        color: ' rgb(245 245 245)',
-                        maxWidth: "100%",
-                        display: "flex",
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: "flex-end"
+                        display: 'flex',
+                        flexDirection: 'column',
                     }}>
+                        <Box sx={{
+                            color: ' rgb(245 245 245)',
+                            maxWidth: "100%",
+                            display: "flex",
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: "flex-end"
+                        }}>
+                            <Typography
+                                variant='h6'
+                                fontWeight="600"
+                                fontFamily="Raleway"
+                                sx={{
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    display: "-webkit-box",
+                                    WebkitLineClamp: "5",
+                                    WebkitBoxOrient: "vertical",
+                                    width: "700px",
+                                    fontSize: '16px'
+                                }}
+                            >{task !== undefined ? task : loadTask.task}</Typography>
+                            <Button variant='text'
+                                size="small"
+                                sx={{
+                                    m: 0,
+                                    p: 0,
+                                    color: "rgb(115 115 115)",
+                                    fontFamily: "Raleway",
+                                    fontWeight: "600",
+                                    "&:hover": {
+                                        background: "rgba(82, 82, 82, 0.2)",
+                                    }
+                                }}>
+                                Edit Title
+                            </Button>
+                            <IconButton
+                                aria-label="close"
+                                onClick={onClose}
+                                sx={{
+                                    position: 'absolute',
+                                    right: 10,
+                                    top: 10,
+                                    color: 'rgb(229 229 229)',
+                                }}
+                            >
+                                <Cross1Icon />
+                            </IconButton>
+                        </Box>
                         <Typography
-                            variant='h6'
-                            fontWeight="600"
                             fontFamily="Raleway"
+                            fontWeight="600"
                             sx={{
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                display: "-webkit-box",
-                                WebkitLineClamp: "5",
-                                WebkitBoxOrient: "vertical",
-                                width: "700px",
-                                fontSize: '16px'
+                                color: "rgba(115, 115, 115, 1)",
+                                mt: 1
                             }}
-                        >{task !== undefined ? task : loadTask.task}</Typography>
-                        <Button variant='text'
-                            size="small"
-                            sx={{
-                                m: 0,
-                                p: 0,
-                                color: "rgb(115 115 115)",
-                                fontFamily: "Raleway",
-                                fontWeight: "600",
-                                "&:hover": {
-                                    background: "rgba(82, 82, 82, 0.2)",
-                                }
-                            }}>
-                            Edit Title
-                        </Button>
-                        <IconButton
-                            aria-label="close"
-                            onClick={onClose}
-                            sx={{
-                                position: 'absolute',
-                                right: 10,
-                                top: 10,
-                                color: 'rgb(229 229 229)',
-                            }}
-                        >
-                            <Cross1Icon />
-                        </IconButton>
+                        >Added on: {dateAdded}</Typography>
                     </Box>
                     <Stack
                         direction="row"
                         spacing={1}
                         sx={{
-                            mt: 2
+                            mt: 1
                         }}
                     >
                         {labels.map((label, index) => (
@@ -152,7 +165,7 @@ export default function TaskPanel({ open, onClose, task, labels }) {
                             fontWeight="500"
                             sx={{
                                 color: "rgba(115, 115, 115, 1)"
-                            }}>No description provided
+                            }}>{description === "" ? "No description provided" : description}
                         </Typography>
                     </Box>
                     <Divider orientation='vertical' sx={{ background: "rgb(82 82 82)" }} />

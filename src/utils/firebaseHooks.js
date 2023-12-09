@@ -40,8 +40,8 @@ const useFirebaseHooks = () => {
   };
 
   const navigate = useNavigate();
-  const uid = auth.currentUser !== null ? auth.currentUser.uid : getId()
-  const email = auth.currentUser !== null ? auth.currentUser.email : null
+  const uid = auth?.currentUser !== null ? auth?.currentUser.uid : getId()
+  const email = auth?.currentUser !== null ? auth?.currentUser.email : null
 
   // const {currentUser: {uid, email}} = getAuth()
 
@@ -159,16 +159,41 @@ const useFirebaseHooks = () => {
   const updateUsers = async (id, users) => {
     const docRef = doc(db, `users/${uid}/boards/${id}`);
     try {
-      console.log(id, users);
-      // await updateDoc(docRef, {
-      //   sharedToUsers: {
-      //     ...users
-      //   }
-      // })
+      await updateDoc(docRef, {
+        sharedToUsers: arrayUnion({
+          canEdit: true,
+          canView: true, 
+          email: users,
+        })
+      })
     } catch (error) {
       throw error;
     }
   };
+
+  const updateUserPermissionChange = async(id, userEmail, accessPermissions) =>{
+    const docRef = doc(db, `users/${uid}/boards/${id}`)
+    try {
+      const docSnap = await getDoc(docRef)
+      if(docSnap.exists) {
+        const removePermissions = docSnap.data().sharedToUsers.filter((user) => user.email !== userEmail.email)
+        const newPermissions = docSnap.data().sharedToUsers.filter((user) => user.email === userEmail.email)
+        if(accessPermissions === 'edit') {
+          newPermissions[0].canEdit = true
+          newPermissions[0].canView = true
+        }
+        else {
+          newPermissions[0].canView = true
+          newPermissions[0].canEdit = false
+        }
+        await updateDoc(docRef, {
+          sharedToUsers: [...removePermissions, ...newPermissions],
+        });
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const updateBoardEditPermissions = async (id, settings) => {
     const docRef = doc(db, `users/${uid}/boards/${id}`);
@@ -214,6 +239,7 @@ const useFirebaseHooks = () => {
     updateUsers,
     updateBoardEditPermissions,
     updateBoardViewPermissions,
+    updateUserPermissionChange,
     uid,
     email,
   };

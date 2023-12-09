@@ -20,6 +20,7 @@ export default function Column({
     handleRemoveTask,
     handleColumnUpdate,
     handleTaskUpdate,
+    edit
 }) 
 {
     const [addTask, setAddTask] = useState(false)
@@ -167,8 +168,10 @@ export default function Column({
                                         <Task 
                                             key={task.id}
                                             id={task.id}
-                                            task={task.task}
-                                            labels={task.labels}
+                                            task={task?.task}
+                                            description={task?.description}
+                                            dateAdded={task?.dateAdded}
+                                            labels={task?.labels}
                                             index={index}
                                             handleRemoveTask={() => handleRemoveTask(columnName, task.id)}
                                             associatedColumn={columnName}
@@ -189,6 +192,7 @@ export default function Column({
                             p: 1,
                         }}>
                             <Button
+                                disabled={!edit}
                                 disableRipple
                                 variant='text'
                                 startIcon={<AddIcon />}

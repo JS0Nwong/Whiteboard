@@ -20,7 +20,14 @@ import { Cross1Icon, ExternalLinkIcon } from '@radix-ui/react-icons'
 import useFirebaseHooks from '../../utils/firebaseHooks'
 
 export default function ShareBoard({ id, data, open, onClose }) {
-    const { updateBoardEditPermissions, updateBoardViewPermissions, updateUsers, uid } = useFirebaseHooks()
+    const { 
+        updateBoardEditPermissions, 
+        updateBoardViewPermissions, 
+        updateUsers, 
+        updateUserPermissionChange,
+        uid, 
+        email 
+    } = useFirebaseHooks()
 
     const [accessPermissions, setAccessPermissions] = useState('view')
     const [copySuccess, setCopySuccess] = useState(false)
@@ -33,12 +40,16 @@ export default function ShareBoard({ id, data, open, onClose }) {
         setCopySuccess(true)
     }
 
-    const handleSelectChange = (e) => {
+    const handleSelectChange = (e, user) => {
         setAccessPermissions(e.target.value)
+        updateUserPermissionChange(id, user, e.target.value)
     }
 
     const handleAddUser = () => {
+        sharedUsers.match(/@/) ? 
         updateUsers(id, sharedUsers)
+        :
+        console.log('not an email')
     }
 
     const handleGlobalEdit = () => {
@@ -49,7 +60,6 @@ export default function ShareBoard({ id, data, open, onClose }) {
     const handleGlobalView = () => {
         setCanViewPublicly(!canViewPublicly)
         updateBoardViewPermissions(id, !canViewPublicly)
-
     }
 
     return (
@@ -62,7 +72,7 @@ export default function ShareBoard({ id, data, open, onClose }) {
                         background: 'rgb(17 17 17)',
                         border: "1px solid rgb(38 38 38)",
                         m: 1,
-                        width: { xs: "auto", md: "25%" },
+                        width: { xs: "auto", sm:"45%", md: "25%" },
                     }
                 }}
             >
@@ -130,7 +140,10 @@ export default function ShareBoard({ id, data, open, onClose }) {
                                     flexDirection: "row",
                                     justifyContent: 'space-between',
                                     width: "100%",
-                                }}>{user.email} {uid === data.boardOwner ?
+                                    '&:last-of-type': {
+                                        mt: 1,
+                                    }
+                                }}>{user.email} {user.email === email ?
                                     <span
                                         style={{
                                             fontWeight: "500",
@@ -147,10 +160,9 @@ export default function ShareBoard({ id, data, open, onClose }) {
                                             }
                                         }}
                                         variant='filled'
-                                        fullWidth
-                                        value={accessPermissions}
+                                        defaultValue={user.canEdit === true ? "edit" : "view"}
                                         label="Role"
-                                        onChange={handleSelectChange}
+                                        onChange={(e) => handleSelectChange(e, user)}
                                         sx={{
                                             m: 0,
                                             p: 0,
@@ -171,7 +183,7 @@ export default function ShareBoard({ id, data, open, onClose }) {
                                         }}
                                     >
                                         <MenuItem value="view">View</MenuItem>
-                                        <MenuItem value="edit">Edit</MenuItem>
+                                        <MenuItem value="edit">View & Edit</MenuItem>
                                     </Select>}
                                 </Typography>
                             )}

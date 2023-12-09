@@ -10,7 +10,7 @@ import useFirebaseHooks from '../../utils/firebaseHooks'
 import useReorder from '../../utils/reorder'
 import useFilter from '../../utils/useFilter'
 
-export default function Board({ columns, id, orderBy, labels }) {
+export default function Board({ columns, id, orderBy, labels, canEdit }) {
     const { updateBoard, updateColumnKeys } = useFirebaseHooks()
     const { reorder, reorderMap, moveBetween } = useReorder()
     const [tasks, setTasks] = useState(structuredClone(columns))
@@ -153,6 +153,8 @@ export default function Board({ columns, id, orderBy, labels }) {
                 task: task, 
                 id: crypto.randomUUID(), 
                 labels: labels,
+                dateAdded: new Date().toLocaleDateString(),
+                description: "",
             }
         )
 
@@ -276,6 +278,7 @@ export default function Board({ columns, id, orderBy, labels }) {
 
                             {keys.map((key, index) => (
                                 <Column
+                                    edit={canEdit || globalEdit || owner}
                                     key={key}
                                     columnName={key}
                                     data={filtered !== null ? filtered[key] : tasks[key]}
@@ -289,7 +292,9 @@ export default function Board({ columns, id, orderBy, labels }) {
                                 />
                             ))}
                             {provided.placeholder}
-                            <AddColumn addColumn={handleAddColumn} />
+                            {canEdit ? <AddColumn
+                                addColumn={handleAddColumn}
+                            /> : <></>}
                         </Box>
                     )}
                 </Droppable>

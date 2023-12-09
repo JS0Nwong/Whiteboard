@@ -14,6 +14,7 @@ export default function LoginView() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [isLogin, setIsLogin] = useState(true)
+    const { setAuth } = useStore()
 
     const navigate = useNavigate()
 
@@ -27,6 +28,7 @@ export default function LoginView() {
                 await signInWithEmailAndPassword(auth, username, password) :
                 await createUserWithEmailAndPassword(auth, username, password)
             navigate("/boards")
+            setAuth(true)
         }
         catch (error) {
             console.log(error)
@@ -116,7 +118,7 @@ export default function LoginView() {
                             fontWeight: "600"
                         }}
                         onClick={onSubmit}
-                        >
+                    >
                         {isLogin ? "Login" : "Register"}
                     </Button>
                     <Typography
