@@ -13,6 +13,8 @@ export default function Task({
     id, 
     index, 
     task, 
+    description,
+    dateAdded,
     status, 
     number, 
     labels,
@@ -191,7 +193,10 @@ export default function Task({
                 onClose={() => handleTaskClose()}
                 task={task}
                 labels={labels}
+                dateAdded={dateAdded}
+                description={description}
             />}
+            {/* Edit Task Form */}
             {openEditTask && <AddTaskForm
                 open={openEditTask}
                 onClose={() => setOpenEditTask(!openEditTask)}

@@ -20,7 +20,7 @@ export default function Column({
     handleRemoveTask,
     handleColumnUpdate,
     handleTaskUpdate,
-
+    edit
 }) 
 {
     const [addTask, setAddTask] = useState(false)
@@ -103,6 +103,13 @@ export default function Column({
                                         sx={{
                                             ml: 1,
                                             color: "rgb(115 115 115)",
+                                            background: "rgb(38 38 38)",
+                                            borderRadius: "99px",
+                                            width: "1.3rem",
+                                            height: "1.3rem",
+                                            display: 'flex',
+                                            alignItems: "center",
+                                            justifyContent: 'center',
                                         }}
                                     >
                                         {data.tasks.length}
@@ -161,8 +168,10 @@ export default function Column({
                                         <Task 
                                             key={task.id}
                                             id={task.id}
-                                            task={task.task}
-                                            labels={task.labels}
+                                            task={task?.task}
+                                            description={task?.description}
+                                            dateAdded={task?.dateAdded}
+                                            labels={task?.labels}
                                             index={index}
                                             handleRemoveTask={() => handleRemoveTask(columnName, task.id)}
                                             associatedColumn={columnName}
@@ -183,6 +192,7 @@ export default function Column({
                             p: 1,
                         }}>
                             <Button
+                                disabled={!edit}
                                 disableRipple
                                 variant='text'
                                 startIcon={<AddIcon />}

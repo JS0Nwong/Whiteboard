@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Dialog,
   DialogActions,
@@ -52,6 +52,10 @@ export default function AddTaskForm({
   const handleClick = () => {
 
   }
+
+  useEffect(() => {
+    console.log(labels)
+  }, [])
 
   return (
     <>

@@ -4,34 +4,30 @@ import { Skeleton, Box } from '@mui/material'
 export default function BoardLoading() {
     return (
         <>
-            <Box style={{
+            <Box sx={{
                 height: "100dvh",
                 display: "flex",
                 flexDirection: 'column',
-                minWidth: "100%"
+                minWidth: "100%",
             }}>
                 <Box sx={{
-                    m: 1,
-                    border: "1px solid rgba(229, 229, 229, 0.25)",
-                    borderRadius: '4px',
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                }}></Box>
+                    p: 1,
+                }}>
+                    <Skeleton variant="rounded" width={"100%"} height={48} sx={{background: 'rgb(64 64 64)' }} />
+                </Box>
                 <Box
                     sx={{
                         height: '100%',
-                        maxHeight: "91%",
                         display: "flex",
-                        flexDirection: "row",
-                        flex: "1, 1, auto",
-                        position: "fixed",
-                        bottom: '5px',
-                        overflowX: 'auto',
-                        overflowY: "hidden",
+                        flexDirection: {
+                            xs: "column",
+                            md: "row"
+                        },
                         width: "100%",
+                        p: 1,
                     }}>
+                    <Skeleton variant="rounded" width={"100%"} height={"100%"} sx={{ background: 'rgb(64 64 64)' }} />
+
                 </Box>
             </Box>
         </>

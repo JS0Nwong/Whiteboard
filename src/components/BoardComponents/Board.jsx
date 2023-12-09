@@ -1,25 +1,74 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Box } from '@mui/material'
 import Column from './Column'
 import AddColumn from './AddColumn'
 import Searchbar from './Searchbar'
 import { DragDropContext, Droppable } from '@hello-pangea/dnd'
+import { useSearchParams} from 'react-router-dom'
 
 import useFirebaseHooks from '../../utils/firebaseHooks'
 import useReorder from '../../utils/reorder'
+import useFilter from '../../utils/useFilter'
 
-export default function Board({ columns, id, orderBy, labels }) {
+export default function Board({ columns, id, orderBy, labels, canEdit }) {
     const { updateBoard, updateColumnKeys } = useFirebaseHooks()
     const { reorder, reorderMap, moveBetween } = useReorder()
     const [tasks, setTasks] = useState(structuredClone(columns))
-    const [filtered, setFiltered] = useState(structuredClone(columns))
+    const [filtered, setFiltered] = useState(null)
     const [loading, setLoading] = useState(false)
-
     const [keys, setKeys] = useState(orderBy)
+
+    const [searchParams, setSearchParams] = useSearchParams()
+    const {filterTasks, filterLabels, filterAll} = useFilter()
+
+    useEffect(() => {
+        if (searchParams.has('filterType') || searchParams.has('filterQuery')) {
+            //searching by all if there is no filter type of task or labels
+            (searchParams.get('filterQuery') !== null && searchParams.get('filterType') === null) ?
+            
+                filterAll(searchParams.get('filterQuery'), tasks, setFiltered) :
+
+                //searching by filter types of labels or tasks
+                searchParams.get('filterQuery') !== null && searchParams.get('filterType') === "task" ?
+                    filterTasks(
+                        searchParams.get('filterType'),
+                        searchParams.get('filterQuery'),
+                        tasks,
+                        setFiltered
+                    ) : filterLabels(
+                        searchParams.get('filterType'),
+                        searchParams.get('filterQuery'),
+                        tasks,
+                        setFiltered
+                    )
+        }
+    }, [])
 
     const handleBoardUpdate = async(data) => {
         await updateBoard(id, data)
         setTasks(data)
+    }
+
+    const handleFilterBoardUpdate = async(data, result) => {
+        let clone = structuredClone(tasks)
+
+        clone[result.source.droppableId].tasks = [
+            ...clone[result.source.droppableId].tasks.filter((task) =>
+                task.id !== result.draggableId
+            ),
+        ]
+
+        clone[result.destination.droppableId].tasks = [
+            ...clone[result.destination.droppableId].tasks.filter((task) => {
+                return(clone[result.source.droppableId].tasks.length > 0 ?
+                    task.id !== result.draggableId :
+                    task.id === result.draggableId)
+            }),
+            ...data[result.destination.droppableId].tasks.filter((task) => task.id === result.draggableId),
+        ]
+        setTasks(clone)
+        handleBoardUpdate(clone)
+        // need to update board but only when user is done filtering
     }
 
     const handleOrderUpdate = async(keys) => {
@@ -104,6 +153,8 @@ export default function Board({ columns, id, orderBy, labels }) {
                 task: task, 
                 id: crypto.randomUUID(), 
                 labels: labels,
+                dateAdded: new Date().toLocaleDateString(),
+                description: "",
             }
         )
 
@@ -174,21 +225,28 @@ export default function Board({ columns, id, orderBy, labels }) {
             setKeys(reorderedOrder);
             return;
         }
-
+    
         // reordering tasks
         const data = reorderMap({
-            tasks: tasks,
+            tasks: filtered !== null ? filtered : tasks,
             source,
             destination,
         })
-        handleBoardUpdate(data.tasks)
-        setTasks(data.tasks)
+        
+        if (filtered === null) {
+            setTasks(data.tasks)
+            handleBoardUpdate(data.tasks)
+        } else {
+            setFiltered(data.tasks)
+            handleFilterBoardUpdate(data.tasks, result)
+        }
     }
 
     return (
         <>
             <Box>
                 <Searchbar 
+                    data={tasks}
                     setFilteredData={setFiltered}
                 />
             </Box>
@@ -220,6 +278,7 @@ export default function Board({ columns, id, orderBy, labels }) {
 
                             {keys.map((key, index) => (
                                 <Column
+                                    edit={canEdit || globalEdit || owner}
                                     key={key}
                                     columnName={key}
                                     data={filtered !== null ? filtered[key] : tasks[key]}
@@ -233,7 +292,9 @@ export default function Board({ columns, id, orderBy, labels }) {
                                 />
                             ))}
                             {provided.placeholder}
-                            <AddColumn addColumn={handleAddColumn} />
+                            {canEdit ? <AddColumn
+                                addColumn={handleAddColumn}
+                            /> : <></>}
                         </Box>
                     )}
                 </Droppable>

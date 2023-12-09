@@ -13,14 +13,16 @@ import {
 } from "@radix-ui/react-icons";
 import { ThemeContext } from "../../App"
 import SettingsPanel from './SettingsPanel';
+import ShareBoard from './ShareBoard';
 
-export default function Menubar({ data, setToggleListView }) {
+export default function Menubar({ id, data, setToggleListView }) {
     const colorMode = useContext(ThemeContext)
     const theme = useTheme()
 
     const [anchorEl, setAnchorEl] = useState(null)
     const [openSetting, setOpenSetting] = useState(false)
     const [switchView, setSwitchView] = useState(false)
+    const [openShare, setOpenShare] = useState(false)
 
     const anchorRef = useRef()
 
@@ -122,7 +124,9 @@ export default function Menubar({ data, setToggleListView }) {
                         borderRadius: "5px",
                         m: 1,
                         border: '1px solid  rgba(82, 82, 82, 1)'
-                    }}>
+                    }}
+                        onClick={() => setOpenShare(!openShare)}
+                    >
                         <Share1Icon style={{ width: "20px", height: "20px", color: 'rgba(163, 163, 163, 1)' }} />
                     </IconButton>
                     <IconButton sx={{
@@ -141,6 +145,12 @@ export default function Menubar({ data, setToggleListView }) {
                 open={openSetting}
                 onClose={() => setOpenSetting(!openSetting)}
                 anchor={anchorEl}
+            />}
+            {openShare && <ShareBoard
+                id={id}
+                data={data}
+                open={openShare}
+                onClose={() => setOpenShare(!openShare)}
             />}
         </>
     )

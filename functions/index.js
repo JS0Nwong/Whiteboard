@@ -53,3 +53,30 @@ exports.deleteBoardData = onDocumentDeleted(
     return await firestore.doc(`users/${uid}/boardsData/${id}`).delete();
   }
 );
+
+exports.createBoardMetadata = onDocumentCreated(
+  "users/{uid}/boards/{id}",
+  async (event) => {
+    const { uid, id } = event.params;
+    const firestore = getFirestore();
+
+    return await firestore.doc(`boardsMetadata/${id}`).set({
+      boardOwner: uid,
+      sharedToUsers: [{           
+        canEdit: true,
+        canView: true, 
+        email: users,
+      }],
+    });
+  }
+);
+
+exports.deleteBoardMetadata = onDocumentDeleted(
+  "users/{uid}/boards/{id}",
+  async (event) => {
+    const { uid, id } = event.params;
+    const firestore = getFirestore();
+
+    return await firestore.doc(`boardsMetadata/${id}`).delete()
+  }
+);

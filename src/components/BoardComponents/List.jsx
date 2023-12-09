@@ -1,13 +1,15 @@
-import React, { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { clsx } from "clsx"
 
 import { DataGrid } from '@mui/x-data-grid'
 import { Box, useTheme, createTheme } from '@mui/material'
-
+import Searchbar from './Searchbar'
 
 export default function List({ data }) {
 
     const theme = useTheme()
+    const [filtered, setFiltered] = useState(structuredClone(data))
+    const styles = []
 
     const DataGridTheme = createTheme({
         components: {
@@ -27,20 +29,15 @@ export default function List({ data }) {
         },
     });
 
-    const checkKeysUnderObject = (obj, res) => {
-        for (let key in obj) {
-            if (key) {
-                res.push(obj[key].label)
-            }
-        }
-    }
-
-    const getColors = (obj, res) => {
-        for (let key in obj) {
-            if (key) {
-                res.push(obj[key].color)
-            }
-        }
+    const createListStyles = () => {
+        data.map((task, index) => {
+            styles.push(`
+                ".MuiDataGrid-cellContent[title=${task.status}]": {
+                    border: '1px solid rgb(${task.associatedColor})'
+                }, 
+            `)
+        })
+        console.log(...styles)
     }
 
     const columns = [
@@ -49,10 +46,20 @@ export default function List({ data }) {
         { field: "description", headerName: "Description", minWidth: 420, flex: "1", headerClassName: "list-header" },
     ]
 
-    const rows = data
+    const rows = filtered !== null ? filtered : data
+
+    useEffect(() => {
+        createListStyles()
+    }, [])
+
 
     return (
         <>
+            <Box>
+                <Searchbar
+                    setFilteredData={setFiltered}
+                />
+            </Box>
             <Box sx={{ height: "100%", width: '100%', p: 1 }}>
                 <DataGrid
                     rows={rows}
@@ -62,7 +69,7 @@ export default function List({ data }) {
                             paginationModel: { page: 0, pageSize: 100 },
                         },
                     }}
-                    sx={{
+                    sx={[{
                         border: "1px solid rgb(64 64 64)",
                         background:
                             theme.palette.currentTheme === "dark" ? "rgb(20 20 20)" : "rgb(229 231 235)",
@@ -92,12 +99,12 @@ export default function List({ data }) {
                         '&.MuiDataGrid-root .MuiDataGrid-columnHeader:focus, &.MuiDataGrid-root .MuiDataGrid-cell:focus': {
                             outline: 'none',
                         },
-                        ".MuiDataGrid-cellContent[title='InProgress']": {
-                            border: '1px solid red',
-                            borderRadius: "999px",
-                            padding: ".2rem 1rem .2rem 1rem",
-                        }
-                    }}
+                        // ".MuiDataGrid-cellContent[title='InProgress']": {
+                        //     border: '1px solid red',
+                        //     borderRadius: "999px",
+                        //     padding: ".2rem 1rem .2rem 1rem",
+                        // }
+                    }, {...Array.isArray(styles) ? styles : [styles]}]}
                 />
             </Box>
         </>
