@@ -23,7 +23,8 @@ export default function AddTaskForm({
   mode,
   currentTask,
   handleTaskUpdate,
-  labels
+  labels,
+  globalLabels
 }) {
   const [task, setTask] = useState('')
   const [addLabels, setAddLabels] = useState([])
@@ -52,10 +53,6 @@ export default function AddTaskForm({
   const handleClick = () => {
 
   }
-
-  useEffect(() => {
-    console.log(labels)
-  }, [])
 
   return (
     <>
@@ -157,7 +154,7 @@ export default function AddTaskForm({
                     spacing={1}
                     flexWrap="wrap"
                   >
-                    {labels.map((label, index) => (
+                    {mode === "edit" ? globalLabels.map((label, index) => (
                       <Chip
                         key={index}
                         label={label.label}
@@ -165,9 +162,9 @@ export default function AddTaskForm({
                         sx={{
                           fontSize: "12px",
                           border: `1px solid rgb(${label.color})`,
-                          backgroundColor: 
-                            addLabels.map(currentLabels => currentLabels.label_uid).includes(label.label_uid) ? 
-                            `rgba(${label.color.replace(/['"]+/g, '')}, 1)` : "none",
+                          backgroundColor:
+                            labels.map(currentLabels => currentLabels.label_uid).includes(label.label_uid) ?
+                              `rgba(${label.color.replace(/['"]+/g, '')}, 1)` : "none",
                           width: "min-content",
                           "&:hover": {
                             backgroundColor: `rgba(${label.color.replace(/['"]+/g, '')}, 0.25)`,
@@ -175,7 +172,28 @@ export default function AddTaskForm({
                         }}
                         onClick={() => handleAddLabel(label)}
                       />
-                    ))}
+                    )) :
+                      labels.map((label, index) => (
+                        <Chip
+                          key={index}
+                          label={label.label}
+                          size='small'
+                          sx={{
+                            fontSize: "12px",
+                            border: `1px solid rgb(${label.color})`,
+                            backgroundColor:
+                              labels.map(currentLabels => currentLabels.label_uid).includes(label.label_uid) ?
+                                `rgba(${label.color.replace(/['"]+/g, '')}, 1)` : "none",
+                            width: "min-content",
+                            "&:hover": {
+                              backgroundColor: `rgba(${label.color.replace(/['"]+/g, '')}, 0.25)`,
+                            },
+                          }}
+                          onClick={() => handleAddLabel(label)}
+                        />
+                      ))
+
+                    }
                     <Chip
                       label="Add Label"
                       size='small'

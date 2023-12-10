@@ -1,4 +1,4 @@
-import {useState, useRef} from 'react'
+import {useState, useRef, useEffect} from 'react'
 import { Box, Chip, Typography, IconButton, Link, useTheme } from '@mui/material'
 import { Draggable } from '@hello-pangea/dnd'
 
@@ -18,16 +18,21 @@ export default function Task({
     status, 
     number, 
     labels,
+    globalLabels,
     handleRemoveTask,
     associatedColumn,
-    handleTaskUpdate
+    handleTaskUpdate,
+    openPanel
 }) {
     const [openPopover, setOpenPopOver] = useState(false)
     const [openEditTask, setOpenEditTask] = useState(false)
     const [anchorEl, setAnchorEl] = useState(null);
-    const [openTaskPanel, setOpenTaskPanel] = useState(false)
+    const [openTaskPanel, setOpenTaskPanel] = useState(openPanel)
 
     const [searchParams, setSearchParams] = useSearchParams()
+
+    const [paramsTaskID, setParamsTaskID] = useState('')
+    const [paramsTaskColumn, setParamsTaskColumn] = useState('')
 
     const anchorRef = useRef()
 
@@ -195,6 +200,8 @@ export default function Task({
                 labels={labels}
                 dateAdded={dateAdded}
                 description={description}
+                taskId={paramsTaskID}
+                taskColumn={paramsTaskColumn}
             />}
             {/* Edit Task Form */}
             {openEditTask && <AddTaskForm
@@ -205,6 +212,7 @@ export default function Task({
                 columnName={associatedColumn}
                 handleTaskUpdate={handleTaskUpdate}
                 labels={labels}
+                globalLabels={globalLabels}
             />}
         </>
     )
