@@ -1,28 +1,30 @@
-import {useState, useRef, useEffect} from 'react'
-import { Box, Chip, Typography, IconButton, Link, useTheme } from '@mui/material'
+import { useState, useRef, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { Box, Chip, IconButton, Link, useTheme } from '@mui/material'
 import { Draggable } from '@hello-pangea/dnd'
-
 import { DotsHorizontalIcon } from "@radix-ui/react-icons"
+
 import TaskPopover from './TaskPopover'
 import TaskPanel from '../TaskPanel/TaskPanel'
-
-import { useSearchParams } from 'react-router-dom'
 import AddTaskForm from './AddTaskForm'
+import useFilter from '../../utils/useFilter'
+import useStore from '../../store'
 
 export default function Task({
-    id, 
-    index, 
-    task, 
+    id,
+    index,
+    task,
     description,
     dateAdded,
-    status, 
-    number, 
+    status,
+    number,
     labels,
     globalLabels,
     handleRemoveTask,
     associatedColumn,
     handleTaskUpdate,
-    openPanel
+    setFilteredData,
+    openPanel,
 }) {
     const [openPopover, setOpenPopOver] = useState(false)
     const [openEditTask, setOpenEditTask] = useState(false)
@@ -35,20 +37,32 @@ export default function Task({
     const [paramsTaskColumn, setParamsTaskColumn] = useState('')
 
     const anchorRef = useRef()
+    const { filterLabelsByClick, clearFilters } = useFilter()
+    const { data } = useStore()
 
     const handleOpenPopover = () => {
         setOpenPopOver(!openPopover)
         setAnchorEl(anchorRef.current)
     }
 
+    const handleTagFilter = (label) => {
+        if(searchParams.getAll('filterQuery').includes(label)) {
+            const params = searchParams.getAll('filterQuery')
+            clearFilters('label', data, setFilteredData, label, params)
+        }
+        else {
+            filterLabelsByClick('label', label, data, setFilteredData)
+        }
+    }
+
     const handleTaskClose = () => {
         setOpenTaskPanel(false)
-        if(searchParams.has('task') && searchParams.has('column')) {
+        if (searchParams.has('task') && searchParams.has('column')) {
             searchParams.delete('column')
             searchParams.delete('task')
             setSearchParams(searchParams)
         }
-    } 
+    }
 
     const handleTaskOpen = () => {
         setOpenTaskPanel(true)
@@ -74,7 +88,7 @@ export default function Task({
                         sx={{
                             display: "flex",
                             flexDirection: "column",
-                            backgroundColor: theme.palette.currentTheme === "dark" ? "rgb(30 30 30)" : "rgb(226 232 240)" ,
+                            backgroundColor: theme.palette.currentTheme === "dark" ? "rgb(30 30 30)" : "rgb(226 232 240)",
                             border: "1px solid rgb(45 45 45)",
                             borderRadius: "4px",
                             p: 1,
@@ -114,15 +128,15 @@ export default function Task({
                                 m: 0,
                                 p: 0,
                             }}
-                            onClick={() => handleOpenPopover()}
+                                onClick={() => handleOpenPopover()}
                             >
-                                <DotsHorizontalIcon 
-                                style={{
-                                    width: "20px",
-                                    height: "20px",
-                                    color: 'rgba(163, 163, 163, 1)'
-                                }} 
-                                ref={anchorRef}
+                                <DotsHorizontalIcon
+                                    style={{
+                                        width: "20px",
+                                        height: "20px",
+                                        color: 'rgba(163, 163, 163, 1)'
+                                    }}
+                                    ref={anchorRef}
 
                                 />
                             </IconButton>
@@ -149,7 +163,7 @@ export default function Task({
                                         color: "rgb(37 99 235)",
                                         textDecoration: 'underline',
                                     }
-                                }} 
+                                }}
                                 onClick={() => handleTaskOpen()}
                             >
                                 {task}
@@ -165,30 +179,31 @@ export default function Task({
                         }}>
                             {labels.map((label, key) => (
                                 <Chip
-                                key={key}
-                                label={label.label}
-                                size='small'
-                                sx={{
-                                    fontSize: "12px",
-                                    border: `1px solid rgb(${label.color})`,
-                                    backgroundColor: `rgba(${label.color.replace(/['"]+/g, '')}, 1)`,
-                                    width: "min-content",
-                                    position: "relative",
-                                    mr: 1,
-                                    mt: 1,
-                                    "&:hover": {
-                                      backgroundColor: `rgba(${label.color.replace(/['"]+/g, '')}, 1)`,
-                                    },
-                                  }}
+                                    key={key}
+                                    label={label.label}
+                                    size='small'
+                                    sx={{
+                                        fontSize: "12px",
+                                        border: `1px solid rgb(${label.color})`,
+                                        backgroundColor: `rgba(${label.color.replace(/['"]+/g, '')}, 1)`,
+                                        width: "min-content",
+                                        position: "relative",
+                                        mr: 1,
+                                        mt: 1,
+                                        "&:hover": {
+                                            backgroundColor: `rgba(${label.color.replace(/['"]+/g, '')}, 1)`,
+                                        },
+                                    }}
+                                    onClick={() => handleTagFilter(label.label)}
                                 />
                             ))}
                         </Box>
                     </Box>
                 )}
             </Draggable>
-            {openPopover && <TaskPopover 
+            {openPopover && <TaskPopover
                 open={openPopover}
-                onClose={() => setOpenPopOver(!openPopover)} 
+                onClose={() => setOpenPopOver(!openPopover)}
                 anchor={anchorEl}
                 handleRemoveTask={() => handleRemoveTask()}
                 openEditTask={() => setOpenEditTask(true)}
@@ -202,6 +217,7 @@ export default function Task({
                 description={description}
                 taskId={paramsTaskID}
                 taskColumn={paramsTaskColumn}
+                handleTaskUpdate={handleTaskUpdate}
             />}
             {/* Edit Task Form */}
             {openEditTask && <AddTaskForm
@@ -209,10 +225,12 @@ export default function Task({
                 onClose={() => setOpenEditTask(!openEditTask)}
                 mode={'edit'}
                 currentTask={task}
+                description={description}
                 columnName={associatedColumn}
                 handleTaskUpdate={handleTaskUpdate}
                 labels={labels}
                 globalLabels={globalLabels}
+                id={id}
             />}
         </>
     )

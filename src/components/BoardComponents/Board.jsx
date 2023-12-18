@@ -14,7 +14,7 @@ export default function Board({ columns, id, orderBy, labels, canEdit }) {
     const { updateBoard, updateColumnKeys } = useFirebaseHooks()
     const { reorder, reorderMap, moveBetween } = useReorder()
     const [tasks, setTasks] = useState(structuredClone(columns))
-    const [filtered, setFiltered] = useState(null)
+    const [filtered, setFiltered] = useState(null)  
     const [loading, setLoading] = useState(false)
     const [keys, setKeys] = useState(orderBy)
 
@@ -37,7 +37,7 @@ export default function Board({ columns, id, orderBy, labels, canEdit }) {
                         setFiltered
                     ) : filterLabels(
                         searchParams.get('filterType'),
-                        searchParams.get('filterQuery'),
+                        searchParams.getAll('filterQuery'),
                         tasks,
                         setFiltered
                     )
@@ -59,16 +59,15 @@ export default function Board({ columns, id, orderBy, labels, canEdit }) {
         ]
 
         clone[result.destination.droppableId].tasks = [
-            ...clone[result.destination.droppableId].tasks.filter((task) => {
-                return(clone[result.source.droppableId].tasks.length > 0 ?
-                    task.id !== result.draggableId :
-                    task.id === result.draggableId)
-            }),
-            ...data[result.destination.droppableId].tasks.filter((task) => task.id === result.draggableId),
+            ...clone[result.destination.droppableId].tasks,
+            ...data[result.destination.droppableId].tasks
         ]
+        await updateBoard(id, clone)
         setTasks(clone)
-        handleBoardUpdate(clone)
-        // need to update board but only when user is done filtering
+
+        // todo update board only after the user is done filtering 
+        // but update the search results so data is consistant and moves when a 
+        // user drags a task while in the filtered state
     }
 
     const handleOrderUpdate = async(keys) => {
@@ -89,9 +88,20 @@ export default function Board({ columns, id, orderBy, labels, canEdit }) {
 
     }
 
-    const handleTaskUpdate = async (task, currentTask, description, columnName) => {
+    const handleTaskUpdate = async (
+        id,
+        task,
+        labels,
+        description,
+        columnName
+    ) => {
+        console.log(description, columnName)
         const clone = structuredClone(tasks)
-        clone[columnName].tasks.find((task) => task.task === currentTask).task = task
+        const taskToBeupdate = clone[columnName].tasks.find((task) => task.id === id)
+        taskToBeupdate.task = task
+        taskToBeupdate.labels = labels
+        taskToBeupdate.description = description
+
         try {
             await handleBoardUpdate(clone)
         } catch (error) {
@@ -289,6 +299,7 @@ export default function Board({ columns, id, orderBy, labels, canEdit }) {
                                     handleRemoveTask={handleRemoveTask}
                                     handleColumnUpdate={handleColumnUpdate}
                                     handleTaskUpdate={handleTaskUpdate}
+                                    setFilteredData={setFiltered}
                                 />
                             ))}
                             {provided.placeholder}

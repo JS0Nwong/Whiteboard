@@ -24,14 +24,21 @@ export default function AddTaskForm({
   currentTask,
   handleTaskUpdate,
   labels,
-  globalLabels
+  globalLabels,
+  description,
+  id
 }) {
   const [task, setTask] = useState('')
-  const [addLabels, setAddLabels] = useState([])
+  const [addLabels, setAddLabels] = useState(labels)
 
   const handleSubmit = () => {
     if(mode === "edit") { 
-      handleTaskUpdate(task, currentTask, addLabels, columnName)
+      handleTaskUpdate(
+        id, 
+        task === "" ? currentTask : task, 
+        addLabels.length !== 0 ? addLabels : labels,
+        description, 
+        columnName)
       onClose()
     }
     else {

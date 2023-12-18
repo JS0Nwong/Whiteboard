@@ -18,7 +18,6 @@ const useBoard = (uid, id) => {
 
     useEffect(() => {
       const docRef = collection(db, `users/${uid}/boardsData/${id}/tasks`);
-
       return onSnapshot(docRef, (snapshot) => {
         const docs = []
         snapshot.forEach((doc) => {
@@ -47,7 +46,6 @@ const useBoard = (uid, id) => {
             const entries = Object.fromEntries((
                 Object.entries(tasks).sort(([, a], [, b]) => a.id - b.id)
             ))
-
             setFinal(entries)
         }
     }, [tasks, columns])

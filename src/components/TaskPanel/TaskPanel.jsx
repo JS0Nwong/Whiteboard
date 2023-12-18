@@ -7,7 +7,8 @@ import {
     IconButton,
     Button,
     Chip,
-    Stack
+    Stack,
+    TextField
 } from "@mui/material"
 import { Cross1Icon } from '@radix-ui/react-icons'
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -20,27 +21,58 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import { getAuth } from "firebase/auth";
+import sanitizeHtml from "sanitize-html";
+
 
 import Editor from '../RichTextEditor/Editor';
+import useFirebaseHooks from "../../utils/firebaseHooks"
 
-export default function TaskPanel({ open, onClose, task, labels, description, dateAdded, taskId, taskColumn}) {
+export default function TaskPanel({
+    open,
+    onClose,
+    task,
+    labels,
+    description,
+    dateAdded,
+    taskId,
+    taskColumn,
+    handleTaskUpdate
+}) {
     const [searchParams, setSearchParams] = useSearchParams()
     const [loadTask, setTask] = useState(null)
     const [comment, setComment] = useState('')
+    const [descriptionUpdate, setDescriptionUpdate] = useState('')
     const [openEditDescription, setOpenEditDescription] = useState(false)
+    const [openRich, setOpenRich] = useState(false)
     const { id } = useParams();
     const {
         currentUser: { uid },
     } = getAuth();
 
     const setPostContent = (e) => {
-        console.log(e)
         setComment(e)
+    }
+    const { updateBoard } = useFirebaseHooks()
+
+    const handleDescriptionUpdate = () => {
+        descriptionUpdate.trim() !== "" ? handleTaskUpdate(task, task, descriptionUpdate, searchParams.get('column')) : <></>
     }
 
     const handleOpenDescription = () => {
         setOpenEditDescription(!openEditDescription)
     }
+
+    const sanitize = sanitizeHtml(description, {
+        allowedTags: [
+            "footer", "header", "h1", "h2", "h3", "h4",
+            "h5", "h6", "blockquote", "dd",
+            "hr", "li", "main", "ol", "p", "pre",
+            "ul", "a", "abbr", "b", "br", "cite", "code", "data", "dfn",
+            "em", "i", "mark", "q", "s", "samp",
+            "small", "span", "strong", "sub", "sup", "time", "u", "var", "wbr", "caption",
+            "col", "colgroup", "table", "tbody", "td", "tfoot", "th", "thead", "tr"
+        ],
+    })
 
     useEffect(() => {
         if (taskId && taskColumn) {
@@ -190,19 +222,37 @@ export default function TaskPanel({ open, onClose, task, labels, description, da
                         maxHeight: "100%",
                         height: "100%",
                     }}>
-                        <Box sx={{ }}>
+                        <Box>
                             {openEditDescription === false ?
-                                <Typography
-                                    fontFamily="Raleway"
-                                    fontWeight="500"
-                                    sx={{
-                                        color: "rgba(115, 115, 115, 1)"
-                                    }}>{description === "" ? "No description provided" : description}
-                                </Typography> :
+                                //check if the description is an HTML string if it is, set inner HTML 
+                                //else display the contents normally
+                                description[0] === "<" ?
+                                    <Typography
+                                        fontFamily="Raleway"
+                                        fontWeight="500"
+                                        dangerouslySetInnerHTML={{
+                                            __html: sanitize
+                                        }}
+                                        sx={{
+                                            color: "rgba(163, 163, 163, 1)"
+                                        }}>
+                                    </Typography>
+                                    :
+                                    <Typography
+                                        fontFamily="Raleway"
+                                        fontWeight="500"
+                                        sx={{
+                                            color: "rgba(163, 163, 163, 1)"
+                                        }}>
+                                        {description === "" ? "No description provided" : description}
+                                    </Typography>
+
+                                :
+
                                 <Box>
                                     <Editor
                                         placeholder={'Edit your description'}
-                                        editorHtmlChange={(e) => setPostContent(e)}
+                                        editorHtmlChange={(e) => setDescriptionUpdate(e)}
                                         styles={"snow"}
                                     />
                                     <Box sx={{
@@ -212,10 +262,14 @@ export default function TaskPanel({ open, onClose, task, labels, description, da
                                         justifyContent: "flex-end",
                                         mt: 2,
                                     }}>
-                                        <Button variant='contained' sx={{ mr: 1 }}>Cancel</Button>
+                                        <Button 
+                                            variant='contained' 
+                                            sx={{ mr: 1 }} 
+                                            onClick={() => setOpenEditDescription(!openEditDescription)}
+                                        >Cancel</Button>
                                         <Button
                                             variant='contained'
-                                            disabled={comment.trim() !== "" ? false : true}
+                                            disabled={descriptionUpdate.trim() !== "" ? false : true}
                                             sx={{
                                                 color: 'rgb(220 220 220)',
                                                 background: "rgba(56, 142, 60, 1)",
@@ -231,7 +285,9 @@ export default function TaskPanel({ open, onClose, task, labels, description, da
                                                     backgroundColor: "rgba(56, 142, 60, 0.5)",
                                                     cursor: "not-allowed"
                                                 }
-                                            }}>Update</Button>
+                                            }}
+                                            onClick={() => handleDescriptionUpdate()}
+                                        >Update</Button>
                                     </Box>
                                 </Box>}
                         </Box>
@@ -243,39 +299,86 @@ export default function TaskPanel({ open, onClose, task, labels, description, da
                             maxHeight: "100%",
                             position: "relative"
                         }}>
-                            <Editor
+                            {openRich === true ? <Editor
                                 placeholder={'Add a comment'}
                                 editorHtmlChange={(e) => setPostContent(e)}
                                 styles={"snow"}
-                            />
+                            /> :
+                                <TextField
+                                    inputProps={{
+                                        style: {
+                                            fontFamily: "Poppins",
+                                            color: "#DDD"
+                                        }
+                                    }}
+                                    placeholder='Add a comment'
+                                    multiline
+                                    rows={9}
+                                    sx={{
+                                        border: '1px solid rgb(82 82 82)',
+                                        backgroundColor: 'rgb(30 30 30)',
+                                        width: '100%',
+                                        borderRadius: "5px",
+                                        resize: 'vertical',
+                                        maxHeight: ' 530px',
+                                        maxWidth: '100%',
+                                        color: "white",
+                                        "& .MuiInputBase-root.MuiOutlinedInput-root ::placeholder": {
+                                            color: 'rgb(182, 182, 182)',
+                                            fontStyle: "italic"
+                                        },
+                                        "&.MuiTextField-root": {
+                                            '&:hover fieldset': {
+                                                borderColor: 'rgb(163 163 163)',
+                                            },
+                                            ".Mui-focused fieldset": {
+                                                borderColor: 'rgb(212 212 212)',
+                                            },
+                                        },
+                                
+                                    }}
+                                />}
                         </Box>
-                        <Box sx={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            width: '100%',
-                            justifyContent: "flex-end",
-                            mt: 2,
-                        }}>
-                            <Button variant='contained' sx={{ mr: 1 }}>Cancel</Button>
-                            <Button
-                                variant='contained'
-                                disabled={comment.trim() !== "" ? false : true}
-                                sx={{
-                                    color: 'rgb(220 220 220)',
-                                    background: "rgba(56, 142, 60, 1)",
-                                    width: "max-content",
-                                    justifyContent: "flex-start",
-                                    "&.MuiButton-outlined": {
-                                        border: "1px solid rgb(64 64 64)",
-                                    },
-                                    "&:hover": {
-                                        backgroundColor: "rgba(56, 142, 60, 1)"
-                                    },
-                                    "&.Mui-disabled": {
-                                        backgroundColor: "rgba(56, 142, 60, 0.5)",
-                                        cursor: "not-allowed"
-                                    }
-                                }}>Comment</Button>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                width: '100%',
+                                justifyContent: "flex-start",
+                                mt: 2,
+                            }}>
+                            <Button 
+                                variant='contained' 
+                                sx={{ width: '25%', m: 0, p: 0, } } 
+                                onClick={() => setOpenRich(!openRich)}
+                            >{openRich ? "Quick Comment" : 'Advance Comment'}</Button>
+                            <Box sx={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                width: '100%',
+                                justifyContent: "flex-end",
+                            }}>
+                                <Button variant='contained' sx={{ mr: 1 }}>Cancel</Button>
+                                <Button
+                                    variant='contained'
+                                    disabled={comment.trim() !== "" ? false : true}
+                                    sx={{
+                                        color: 'rgb(220 220 220)',
+                                        background: "rgba(56, 142, 60, 1)",
+                                        width: "max-content",
+                                        justifyContent: "flex-start",
+                                        "&.MuiButton-outlined": {
+                                            border: "1px solid rgb(64 64 64)",
+                                        },
+                                        "&:hover": {
+                                            backgroundColor: "rgba(56, 142, 60, 1)"
+                                        },
+                                        "&.Mui-disabled": {
+                                            backgroundColor: "rgba(56, 142, 60, 0.5)",
+                                            cursor: "not-allowed"
+                                        }
+                                    }}>Comment</Button>
+                            </Box>
                         </Box>
                     </Box>
 

@@ -60,12 +60,13 @@ exports.createBoardMetadata = onDocumentCreated(
     const { uid, id } = event.params;
     const firestore = getFirestore();
 
+    console.log(event.params)
     return await firestore.doc(`boardsMetadata/${id}`).set({
       boardOwner: uid,
       sharedToUsers: [{           
         canEdit: true,
         canView: true, 
-        email: users,
+        email: uid,
       }],
     });
   }

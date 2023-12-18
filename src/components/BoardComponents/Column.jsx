@@ -20,6 +20,7 @@ export default function Column({
     handleRemoveTask,
     handleColumnUpdate,
     handleTaskUpdate,
+    setFilteredData,
     edit
 }) 
 {
@@ -189,6 +190,7 @@ export default function Column({
                                             handleRemoveTask={() => handleRemoveTask(columnName, task.id)}
                                             associatedColumn={columnName}
                                             handleTaskUpdate={handleTaskUpdate}
+                                            setFilteredData={setFilteredData}
                                         />
                                     ))}
                                     {provided.placeholder}
