@@ -1,14 +1,14 @@
 import { useEffect, useState, useRef } from 'react'
 import { Box, Icon, IconButton, Typography, Button, useTheme } from '@mui/material'
-import Task from './Task'
-
 import { Draggable, Droppable } from '@hello-pangea/dnd'
 import { DotsHorizontalIcon } from "@radix-ui/react-icons"
+import { useSearchParams } from 'react-router-dom'
 import AddIcon from '@mui/icons-material/Add';
 
 import AddTaskForm from "./AddTaskForm"
 import ColumnPopover from './ColumnPopover'
 import AddColumnForm from './AddColumnForm'
+import Task from './Task'
 
 export default function Column({
     index,
@@ -20,6 +20,7 @@ export default function Column({
     handleRemoveTask,
     handleColumnUpdate,
     handleTaskUpdate,
+    setFilteredData,
     edit
 }) 
 {
@@ -27,6 +28,11 @@ export default function Column({
     const [openPopover, setOpenPopOver] = useState(false)
     const [anchorEl, setAnchorEl] = useState(null);
     const [openEdit, setOpenEdit ] = useState(false)
+    const [searchParams, setSearchParams] = useSearchParams()
+    const [paramsTaskID, setParamsTaskID] = useState('')
+    const [paramsTaskColumn, setParamsTaskColumn] = useState('')
+    const [openPanel, setOpenPanel] = useState(false)
+
     const theme = useTheme()
 
     const anchorRef = useRef()
@@ -35,6 +41,12 @@ export default function Column({
         setOpenPopOver(!openPopover)
         setAnchorEl(anchorRef.current)
     }
+
+    useEffect(() => {
+        if (searchParams.has('task') && searchParams.has('column')) {
+            setOpenPanel(true)
+        }
+    }, [])
 
     return (
         <>
@@ -166,16 +178,19 @@ export default function Column({
                                 >
                                     {data.tasks.map((task, index) => (
                                         <Task 
+                                            openPanel={task.id === searchParams.get('task') ? true : false}
                                             key={task.id}
                                             id={task.id}
                                             task={task?.task}
                                             description={task?.description}
                                             dateAdded={task?.dateAdded}
                                             labels={task?.labels}
+                                            globalLabels={labels}
                                             index={index}
                                             handleRemoveTask={() => handleRemoveTask(columnName, task.id)}
                                             associatedColumn={columnName}
                                             handleTaskUpdate={handleTaskUpdate}
+                                            setFilteredData={setFilteredData}
                                         />
                                     ))}
                                     {provided.placeholder}

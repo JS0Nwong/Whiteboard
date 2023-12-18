@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Box, Input, InputAdornment } from '@mui/material'
+import { Box, Input, InputAdornment, Button } from '@mui/material'
 import useDebounce from '../../utils/useDebounce'
 import useStore from '../../store'
 import SortIcon from '@mui/icons-material/Sort';
@@ -7,14 +7,12 @@ import { useSearchParams } from 'react-router-dom'
 
 import useFilter from '../../utils/useFilter';
 
-export default function Searchbar({ setFilteredData }) {
+export default function Searchbar({ data, setFilteredData }) {
 
     const {filterTasks, filterLabels, filterAll} = useFilter()
-
-    const { data } = useStore()
-    // get board data from global state store
     
     const [searchParams, setSearchParams] = useSearchParams()
+    // url searchparams setter
 
     const [search, setSearch] = useState('')
     // get user search query from search bar
@@ -51,13 +49,31 @@ export default function Searchbar({ setFilteredData }) {
             filterAll(search, data, setFilteredData)
         }
     }
+    // useEffect(() => {
+    //     if (searchParams.has('filterType') && searchParams.has('filterQuery')) {
+    //         const stringConcat = searchParams.get('filterType')+":"+searchParams.get('filterQuery')
+    //         setSearch(searchParams.get('filterType')+":"+searchParams.get('filterQuery'))
+    //         setFilter(searchParams.get('filterType'))
+    //         setQuery(searchParams.get('filterQuery'))
+    //     }
+    //     else if(searchParams.has('filterQuery') && searchParams.get('filterType') === null) {
+    //         setSearch(searchParams.get('filterQuery'))
+    //         setQuery(searchParams.get('filterQuery'))
+    //         setFilter('')
+    //     }
+    //     // else{
+    //     //     setSearch('')
+    //     //     setFilter('')
+    //     //     setQuery('')
+    //     // } 
+    // }, [searchParams])
     
     useEffect(() => {
         query.trim() !== "" || search.trim() === '' ? clearSearch() : setFilteredData(searchResult)
     }, [data, search, setFilteredData])
 
     useEffect(() => {
-        search !== "" ? getFilters(search) : setFilteredData(null)
+        search.trim() !== "" ? getFilters(search) : setFilteredData(null)
     }, [search])
 
     // useDebounce(() => {
@@ -68,16 +84,14 @@ export default function Searchbar({ setFilteredData }) {
     return (
         <Box sx={{
             m: 1,
+            display: 'flex',
+            flexDirection: 'row'
         }}>
             <Input
+                value={search}
                 fullWidth
                 disableUnderline
                 placeholder={'Filter by keyword or fields'}
-                defaultValue={
-                    searchParams.has('filterType') && searchParams.has('filterQuery') ?
-                        `${searchParams.get('filterType')}:${searchParams.get('filterQuery')}` :
-                        searchParams.get('filterQuery')
-                }
                 startAdornment={
                     <InputAdornment position="start">
                       <SortIcon sx={{color: "#888"}}/>
@@ -86,6 +100,7 @@ export default function Searchbar({ setFilteredData }) {
                 sx={{
                     pl: 1,
                     pr: 1,
+                    mr: 1,
                     overflow: "visible",
                     fontWeight: "400",
                     fontSize:"13px",
@@ -100,6 +115,25 @@ export default function Searchbar({ setFilteredData }) {
                 autoComplete="off"
                 onChange={(e) => setSearch(e.target.value)}
             />
+            <Button
+                disabled={search.trim() !== "" ? false : true}
+                variant='contained'
+                sx={{
+                    m: 0,
+                    p: 0,
+                    backgroundColor: "rgba(68, 68, 68, 1)",
+                    cursor: search.trim() !== ""  ? "pointer" : 'not-allowed',
+                    "&:hover": {
+                        backgroundColor: "rgba(68, 68, 68, 1)",
+                    },
+                    "&.Mui-disabled": {
+                        backgroundColor: "rgba(243, 243, 243, 0.2)",
+                    },
+                }}
+                onClick={(e) => setSearch('')}
+            >
+                Clear
+            </Button>
         </Box>
     )
 }
