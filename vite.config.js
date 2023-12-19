@@ -7,4 +7,11 @@ export default defineConfig({
   commonjsOptions: {
     esmExternals: true,
   },
+  build: {
+    rollupOptions: {
+      external: [
+        "react-quill"
+      ]
+    }
+  }
 })
