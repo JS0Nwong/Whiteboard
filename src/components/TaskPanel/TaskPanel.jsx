@@ -23,7 +23,6 @@ import { db } from "../../firebase";
 import { getAuth } from "firebase/auth";
 import sanitizeHtml from "sanitize-html";
 
-
 import Editor from '../RichTextEditor/Editor';
 import useFirebaseHooks from "../../utils/firebaseHooks"
 
@@ -337,7 +336,8 @@ export default function TaskPanel({
                                         },
                                 
                                     }}
-                                />}
+                                />
+                            }
                         </Box>
                         <Box
                             sx={{

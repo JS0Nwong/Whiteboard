@@ -160,6 +160,7 @@ export default function AddTaskForm({
                     direction="row"
                     spacing={1}
                     flexWrap="wrap"
+                    useFlexGap 
                   >
                     {mode === "edit" ? globalLabels.map((label, index) => (
                       <Chip
