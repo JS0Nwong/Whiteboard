@@ -11,6 +11,7 @@ import BoardView from './BoardView'
 import { AuthProvider } from './utils/AuthProvider'
 import PrivateRoute from "./utils/PrivateRoute"
 import PublicRoute from "./utils/PublicRoute"
+import { BoardProvider } from './utils/useBoardSettings'
 
 import useStore from './store'
 
@@ -22,29 +23,31 @@ function AppRoutes() {
   const { publiclyEditable, publiclyViewable } = useStore()
   return (
     <>
-      <CssBaseline />
-      <AuthProvider>
-        <div className='App'>
-          <Routes>
-            <Route path="/" element={<PublicRoute Component={LoginView} />} />
-            <Route path="/boards" element={<PrivateRoute Component={BoardListView} />} />
-            <Route path="/boards/:id" element={
-              publiclyViewable ? <PublicRoute Component={BoardView} /> : <PrivateRoute Component={BoardView} />
-            } />
-            <Route path='*' element={<LoginView />} />
-          </Routes>
-        </div>
-      </AuthProvider>
+      <BoardProvider>
+        <CssBaseline />
+        <AuthProvider>
+          <div className='App'>
+            <Routes>
+              <Route path="/" element={<PublicRoute Component={LoginView} />} />
+              <Route path="/boards" element={<PrivateRoute Component={BoardListView} />} />
+              <Route path="/boards/:id" element={
+                publiclyViewable ? <PublicRoute Component={BoardView} /> : <PrivateRoute Component={BoardView} />
+              } />
+              <Route path='*' element={<LoginView />} />
+            </Routes>
+          </div>
+        </AuthProvider>
+      </BoardProvider>
     </>
   )
 }
 
 function App() {
-  const [currentTheme, setTheme] = useState(() => (localStorage.getItem('theme') || defaultTheme))
+  const [currentTheme, setTheme] = useState(() => (window.localStorage.getItem('theme') || defaultTheme))
   const themeMode = useMemo(() => ({
     toggleTheme: () => {
       setTheme((prevMode) => (prevMode == 'light' ? 'dark' : 'light'))
-      localStorage.setItem('theme', currentTheme)
+      window.localStorage.setItem('theme', currentTheme)
     }
   }), [])
 
@@ -53,7 +56,7 @@ function App() {
       currentTheme,
       ...(currentTheme === 'light' ? {
         background: {
-          default: "rgb(245 245 245)",
+          // default: "rgb(245 245 245)",
           secondary: 'rgb(229 229 229)'
         },
         text: {

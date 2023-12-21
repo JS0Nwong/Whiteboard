@@ -65,6 +65,7 @@ export default function SettingsPanel({ open, onClose, anchor }) {
             background: "rgb(23 23 23)",
             border: "1px solid rgb(64 64 64)",
             width: { xs: "auto", md: "20%" },
+            mt: 1,
           },
         }}
       >
@@ -96,8 +97,8 @@ export default function SettingsPanel({ open, onClose, anchor }) {
           p: 2,
           justifyContent: "space-between",
         }}>
-          {/* <BoardViewSetting />
-          <TaskViewSetting /> */}
+          <BoardViewSetting />
+          <TaskViewSetting />
 
           <Box sx={{
             display: "flex",

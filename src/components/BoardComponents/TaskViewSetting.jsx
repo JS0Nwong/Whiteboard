@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState, useContext } from 'react'
 import {
   Popover,
   Box,
@@ -12,8 +12,10 @@ import {
   FormControl,
   ListItemText,
   InputLabel,
-  OutlinedInput
+  OutlinedInput,
+  useTheme
 } from "@mui/material"
+import { BoardContext } from "../../utils/useBoardSettings"
 const names = [
   'Compact',
   'Default',
@@ -21,16 +23,14 @@ const names = [
 ];
 
 export default function BoardViewSetting() {
-  const [personName, setPersonName] = React.useState([]);
+  const { palette } = useTheme()
+  const { taskView, toggleTask } = useContext(BoardContext)
 
   const handleChange = (event) => {
     const {
       target: { value },
     } = event;
-    setPersonName(
-      // On autofill we get a stringified value.
-      typeof value === 'string' ? value.split(',') : value,
-    );
+    toggleTask(value)
   };
   return (
     <Box sx={{
@@ -40,16 +40,30 @@ export default function BoardViewSetting() {
       justifyContent: "space-between",
       mt: 1,
     }}>
-      <Typography fontFamily="Poppins" fontWeight="500" fontSize="14px" sx={{ width: "100%" }}>Task View</Typography>
+      <Typography
+        fontFamily="Poppins"
+        fontWeight="500"
+        fontSize="14px"
+        sx={{ width: "100%" }}>
+        Task View
+      </Typography>
       <Select
+        inputProps={{
+          MenuProps: {
+            MenuListProps: {
+              sx: {
+                backgroundColor: palette.currentTheme === "dark" ? "rgb(38 38 38)" :'rgb(245 245 245)',
+              }
+            }
+          }
+        }}
         size='small'
         variant='outlined'
         fullWidth
         labelId="demo-multiple-checkbox-label"
         id="demo-multiple-checkbox"
-        value={personName}
+        value={window.localStorage.getItem('task-view') !== null ? window.localStorage.getItem('task-view') : 'Default'}
         onChange={handleChange}
-        renderValue={(selected) => selected.join(', ')}
         sx={{
           m: 0,
           p: 0,
@@ -61,11 +75,24 @@ export default function BoardViewSetting() {
             m: 0,
             p: 0,
           },
+          ".MuiListItemText-primary": {
+            pl: 1
+          },
         }}
       >
         {names.map((name) => (
-          <MenuItem key={name} value={name}>
-            <Checkbox checked={personName.indexOf(name) > -1} />
+          <MenuItem
+            key={name}
+            value={name}
+            disableGutters
+            sx={{
+              color: palette.currentTheme === "dark" ? "rgb(255 255 255)" :'rgb(23 23 23)',
+              fontFamily: "Poppins",
+              fontSize: "14px",
+              fontWeight: '500',
+              p: 1,
+            }}
+          >
             <ListItemText primary={name} />
           </MenuItem>
         ))}

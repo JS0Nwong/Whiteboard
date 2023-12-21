@@ -10,7 +10,8 @@ import {
   FormControl,
   ListItemText,
   InputLabel,
-  OutlinedInput
+  OutlinedInput,
+  useTheme
 } from "@mui/material"
 const names = [
   'List',
@@ -30,33 +31,56 @@ export default function BoardViewSetting() {
       typeof value === 'string' ? value.split(',') : value,
     );
   };
+  const {palette} = useTheme()
+
   return (
     <Box sx={{
       display: "flex",
       flexDirection: 'row',
       width: "100%",
-      justifyContent: "space-between"
+      justifyContent: "space-between",
+      mt: 1,
     }}>
-      <Typography fontFamily="Poppins" fontWeight="500" fontSize="14px" sx={{ width: "100%" }}>Board View</Typography>
+      <Typography
+        fontFamily="Poppins"
+        fontWeight="500"
+        fontSize="14px"
+        sx={{ width: "100%" }}>
+        Board View
+      </Typography>
       <Select
+        inputProps={{
+          MenuProps: {
+            MenuListProps: {
+              sx: {
+                backgroundColor: palette.currentTheme === "dark" ? "rgb(38 38 38)" :'rgb(245 245 245)',
+              }
+            }
+          }
+        }}
         size='small'
         variant='outlined'
         fullWidth
         labelId="demo-multiple-checkbox-label"
         id="demo-multiple-checkbox"
-        value={personName}
+        defaultValue={
+          window.localStorage.getItem('board-view') !== null ? 
+          window.localStorage.getItem('board-view') : 'Cards'
+        }
         onChange={handleChange}
         sx={{
+          m: 0,
+          p: 0,
           "&:label": {
             color: "#fff"
           },
           ".MuiSelect-outlined": {
             border: '1px solid rgb(64 64 64)',
-            pt: '2px',
-            pb: '2px',
-            pr: "2px",
-            fontFamily: "Poppins",
-            fontSize: "14px"
+            m: 0,
+            p: 0,
+          },
+          ".MuiListItemText-primary": {
+            pl: 1
           },
         }}
       >
@@ -66,9 +90,13 @@ export default function BoardViewSetting() {
             value={name}
             disableGutters
             sx={{
-              color: 'red',
-            }}>
-            <Checkbox checked={personName.indexOf(name) > -1} />
+              color: palette.currentTheme === "dark" ? "rgb(255 255 255)" :'rgb(23 23 23)',
+              fontFamily: "Poppins",
+              fontSize: "14px",
+              fontWeight: '500',
+              p: 1,
+            }}
+          >
             <ListItemText primary={name} />
           </MenuItem>
         ))}

@@ -1,14 +1,17 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useContext, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Box, Chip, IconButton, Link, useTheme } from '@mui/material'
+import { Box, Chip, IconButton, Link, Typography, useTheme } from '@mui/material'
 import { Draggable } from '@hello-pangea/dnd'
 import { DotsHorizontalIcon } from "@radix-ui/react-icons"
+import sanitizeHtml from "sanitize-html";
 
 import TaskPopover from './TaskPopover'
 import TaskPanel from '../TaskPanel/TaskPanel'
 import AddTaskForm from './AddTaskForm'
 import useFilter from '../../utils/useFilter'
 import useStore from '../../store'
+import { BoardContext } from "../../utils/useBoardSettings"
+
 
 export default function Task({
     id,
@@ -39,6 +42,7 @@ export default function Task({
     const anchorRef = useRef()
     const { filterLabelsByClick, clearFilters } = useFilter()
     const { data } = useStore()
+    const [compactView, setCompactView] = useState(false)
 
     const handleOpenPopover = () => {
         setOpenPopOver(!openPopover)
@@ -71,8 +75,22 @@ export default function Task({
             column: associatedColumn,
         })
     }
+    const sanitize = sanitizeHtml(description, {
+        allowedTags: [
+            "footer", "header", "h1", "h2", "h3", "h4",
+            "h5", "h6", "blockquote", "dd",
+            "hr", "li", "main", "ol", "p", "pre",
+            "ul", "a", "abbr", "b", "br", "cite", "code", "data", "dfn",
+            "em", "i", "mark", "q", "s", "samp",
+            "small", "span", "strong", "sub", "sup", "time", "u", "var", "wbr", "caption",
+            "col", "colgroup", "table", "tbody", "td", "tfoot", "th", "thead", "tr"
+        ],
+    })
 
     const theme = useTheme()
+    const { taskView } = useContext(BoardContext)
+
+    useEffect(() => {console.log(taskView)}, [])
 
     return (
         <>
@@ -108,7 +126,6 @@ export default function Task({
                             }
                         }}
                     >
-                        {/* Task Number and Status of Task */}
                         <Box sx={{
                             display: 'flex',
                             flexDirection: 'row',
@@ -141,7 +158,8 @@ export default function Task({
                                 />
                             </IconButton>
                         </Box>
-
+                        {/* Task Number and Status of Task */}
+                       
                         {/* Task Description */}
                         <Box sx={{
                             mt: 1,
@@ -168,36 +186,55 @@ export default function Task({
                             >
                                 {task}
                             </Link>
+                            {taskView === "Detailed" ?
+                                <Typography
+                                    fontFamily="Poppins"
+                                    fontWeight="500"
+                                    dangerouslySetInnerHTML={{
+                                        __html: sanitize
+                                    }}
+                                    sx={{
+                                        color: "rgba(163, 163, 163, 1)",
+                                        mt: 1
+                                    }}>
+                                </Typography>
+                                :
+                                <></>
+                            }
                         </Box>
 
                         {/* Task Tags/Additonal Information */}
-                        <Box sx={{
-                            display: "flex",
-                            flexDirection: "row",
-                            flexWrap: "wrap",
-                            mt: 1
-                        }}>
-                            {labels.map((label, key) => (
-                                <Chip
-                                    key={key}
-                                    label={label.label}
-                                    size='small'
-                                    sx={{
-                                        fontSize: "12px",
-                                        border: `1px solid rgb(${label.color})`,
-                                        backgroundColor: `rgba(${label.color.replace(/['"]+/g, '')}, 1)`,
-                                        width: "min-content",
-                                        position: "relative",
-                                        mr: 1,
-                                        mt: 1,
-                                        "&:hover": {
+                        {taskView === "Compact" ? <></> : 
+                            <Box sx={{
+                                display: "flex",
+                                flexDirection: "row",
+                                flexWrap: "wrap",
+                                mt: 1
+                            }}>
+                                {labels.map((label, key) => (
+                                    <Chip
+                                        key={key}
+                                        label={label.label}
+                                        size='small'
+                                        sx={{
+                                            fontSize: "12px",
+                                            border: `1px solid rgb(${label.color})`,
                                             backgroundColor: `rgba(${label.color.replace(/['"]+/g, '')}, 1)`,
-                                        },
-                                    }}
-                                    onClick={() => handleTagFilter(label.label)}
-                                />
-                            ))}
-                        </Box>
+                                            width: "min-content",
+                                            position: "relative",
+                                            mr: 1,
+                                            mt: 1,
+                                            "&:hover": {
+                                                backgroundColor: `rgba(${label.color.replace(/['"]+/g, '')}, 1)`,
+                                            },
+                                        }}
+                                        onClick={() => handleTagFilter(label.label)}
+                                    />
+                                ))}
+                            </Box>
+
+                        }
+                       
                     </Box>
                 )}
             </Draggable>
