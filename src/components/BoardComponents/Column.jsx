@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useContext } from 'react'
 import { Box, Icon, IconButton, Typography, Button, useTheme } from '@mui/material'
 import { Draggable, Droppable } from '@hello-pangea/dnd'
 import { DotsHorizontalIcon } from "@radix-ui/react-icons"
@@ -9,6 +9,7 @@ import AddTaskForm from "./AddTaskForm"
 import ColumnPopover from './ColumnPopover'
 import AddColumnForm from './AddColumnForm'
 import Task from './Task'
+import {ThemeContext} from "../../utils/useTheme"
 
 export default function Column({
     index,
@@ -32,8 +33,8 @@ export default function Column({
     const [paramsTaskID, setParamsTaskID] = useState('')
     const [paramsTaskColumn, setParamsTaskColumn] = useState('')
     const [openPanel, setOpenPanel] = useState(false)
-
-    const theme = useTheme()
+    
+    const { theme } = useContext(ThemeContext)
 
     const anchorRef = useRef()
 
@@ -70,7 +71,7 @@ export default function Column({
                                 xs: "100%",
                                 md: "300px",
                             },
-                            backgroundColor: theme.palette.currentTheme === "dark" ? "rgb(17 17 17)" : "rgb(229 231 235)",
+                            backgroundColor: theme === true ? "rgb(17 17 17)" : "rgb(229 231 235)",
                             position: "relative",
                         }}>
                         {/* Column Header (Title, Description, Tasks Number, Color, Settings) */}
@@ -104,18 +105,21 @@ export default function Column({
                                     <Typography
                                         fontWeight="600"
                                         fontFamily="Raleway"
-
+                                        sx={{
+                                            color: theme === true? 'rgb(255 255 255)' : 'rgb(23 23 23)'
+                                        }}
                                     >
                                         {columnName}
                                     </Typography>
 
                                     <Typography
+                                        fontFamily="Poppins"
                                         fontWeight="500"
                                         fontSize="14px"
                                         sx={{
                                             ml: 1,
-                                            color: "rgb(115 115 115)",
-                                            background: "rgb(38 38 38)",
+                                            color: theme === true ? "rgb(115 115 115)" : 'rgb(38 38 38)',
+                                            backgroundColor: theme === true ? "rgb(38 38 38)" : "rgb(156 163 175)",
                                             borderRadius: "99px",
                                             width: "1.3rem",
                                             height: "1.3rem",
@@ -200,7 +204,7 @@ export default function Column({
 
                         {/* Add Task to Column Button */}
                         <Box sx={{
-                            backgroundColor:theme.palette.currentTheme === "dark" ? "rgb(17 17 17)" : "rgb(229 231 235)",
+                            backgroundColor: theme === true ? "rgb(17 17 17)" : "rgb(229 231 235)",
                             position: "absolute",
                             bottom: 0,
                             width: "100%",
@@ -217,7 +221,7 @@ export default function Column({
                                     width: "100%",
                                     justifyContent: "flex-start",
                                     "&:hover": {
-                                        backgroundColor: theme.palette.currentTheme === "dark" ? "rgb(34 34 34)" : "rgb(209 213 219)",
+                                        backgroundColor: theme === true ? "rgb(34 34 34)" : "rgb(209 213 219)",
                                     },
                                     fontFamily: "Poppins",
                                 }}

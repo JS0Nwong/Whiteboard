@@ -16,6 +16,7 @@ import {
   useTheme
 } from "@mui/material"
 import { BoardContext } from "../../utils/useBoardSettings"
+import { ThemeContext } from '../../utils/useTheme';
 const names = [
   'Compact',
   'Default',
@@ -23,7 +24,7 @@ const names = [
 ];
 
 export default function BoardViewSetting() {
-  const { palette } = useTheme()
+  const { theme } = useContext(ThemeContext)
   const { taskView, toggleTask } = useContext(BoardContext)
 
   const handleChange = (event) => {
@@ -39,6 +40,7 @@ export default function BoardViewSetting() {
       width: "100%",
       justifyContent: "space-between",
       mt: 1,
+      color: theme ? "rgb(255 255 255)" : "rgb(23 23 23 )",
     }}>
       <Typography
         fontFamily="Poppins"
@@ -52,7 +54,7 @@ export default function BoardViewSetting() {
           MenuProps: {
             MenuListProps: {
               sx: {
-                backgroundColor: palette.currentTheme === "dark" ? "rgb(38 38 38)" :'rgb(245 245 245)',
+                backgroundColor: theme ? "rgb(38 38 38)" :'rgb(245 245 245)',
               }
             }
           }
@@ -62,7 +64,9 @@ export default function BoardViewSetting() {
         fullWidth
         labelId="demo-multiple-checkbox-label"
         id="demo-multiple-checkbox"
-        value={window.localStorage.getItem('task-view') !== null ? window.localStorage.getItem('task-view') : 'Default'}
+        value={
+          window.localStorage.getItem('task-view') !== null ? 
+          window.localStorage.getItem('task-view') : 'Default'}
         onChange={handleChange}
         sx={{
           m: 0,
@@ -76,7 +80,8 @@ export default function BoardViewSetting() {
             p: 0,
           },
           ".MuiListItemText-primary": {
-            pl: 1
+            pl: 1,
+            color: theme ? "rgb(255 255 255)" : "rgb(23 23 23 )",
           },
         }}
       >
@@ -86,7 +91,7 @@ export default function BoardViewSetting() {
             value={name}
             disableGutters
             sx={{
-              color: palette.currentTheme === "dark" ? "rgb(255 255 255)" :'rgb(23 23 23)',
+              color: theme ? "rgb(255 255 255)" :'rgb(23 23 23)',
               fontFamily: "Poppins",
               fontSize: "14px",
               fontWeight: '500',

@@ -11,6 +11,7 @@ import AddTaskForm from './AddTaskForm'
 import useFilter from '../../utils/useFilter'
 import useStore from '../../store'
 import { BoardContext } from "../../utils/useBoardSettings"
+import { ThemeContext } from '../../utils/useTheme'
 
 
 export default function Task({
@@ -87,10 +88,8 @@ export default function Task({
         ],
     })
 
-    const theme = useTheme()
+    const { theme } = useContext(ThemeContext)
     const { taskView } = useContext(BoardContext)
-
-    useEffect(() => {console.log(taskView)}, [])
 
     return (
         <>
@@ -106,7 +105,7 @@ export default function Task({
                         sx={{
                             display: "flex",
                             flexDirection: "column",
-                            backgroundColor: theme.palette.currentTheme === "dark" ? "rgb(30 30 30)" : "rgb(226 232 240)",
+                            backgroundColor: theme === true ? "rgb(30 30 30)" : "rgb(226 232 240)",
                             border: "1px solid rgb(45 45 45)",
                             borderRadius: "4px",
                             p: 1,
@@ -175,7 +174,7 @@ export default function Task({
                                     WebkitLineClamp: "5",
                                     WebkitBoxOrient: "vertical",
                                     cursor: 'pointer',
-                                    color: theme.palette.currentTheme === "dark" ? 'white' : 'rgb(23 23 23)',
+                                    color: theme === true ? 'white' : 'rgb(23 23 23)',
                                     textDecoration: 'none',
                                     '&:hover': {
                                         color: "rgb(37 99 235)",
@@ -204,7 +203,7 @@ export default function Task({
                         </Box>
 
                         {/* Task Tags/Additonal Information */}
-                        {taskView === "Compact" ? <></> : 
+                        {taskView === "Compact" ? <></> :
                             <Box sx={{
                                 display: "flex",
                                 flexDirection: "row",
@@ -224,6 +223,7 @@ export default function Task({
                                             position: "relative",
                                             mr: 1,
                                             mt: 1,
+                                            color: theme === true ? "rgb(255 255 255)" : "rgb(23 23 23)",
                                             "&:hover": {
                                                 backgroundColor: `rgba(${label.color.replace(/['"]+/g, '')}, 1)`,
                                             },
@@ -232,9 +232,7 @@ export default function Task({
                                     />
                                 ))}
                             </Box>
-
                         }
-                       
                     </Box>
                 )}
             </Draggable>

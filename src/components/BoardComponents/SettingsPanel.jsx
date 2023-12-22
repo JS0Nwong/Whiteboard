@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import {
   Popover,
   Box,
@@ -14,11 +14,13 @@ import AddLabelsForm from "./AddLabelsForm";
 import { getAuth, signOut } from "firebase/auth";
 import useFirebaseHooks from '../../utils/firebaseHooks'
 import useStore from '../../store';
+import { ThemeContext } from '../../utils/useTheme';
 
 export default function SettingsPanel({ open, onClose, anchor }) {
   const { id } = useParams();
   const { updateLabels } = useFirebaseHooks()
   const { setAuth } = useStore()
+  const { theme } = useContext(ThemeContext)
 
   const handleBoardUpdate = async (data) => {
     await updateLabels(id, data)
@@ -62,7 +64,7 @@ export default function SettingsPanel({ open, onClose, anchor }) {
         anchorEl={anchor}
         sx={{
           ".MuiPopover-paper": {
-            background: "rgb(23 23 23)",
+            background: theme ? "rgb(23 23 23)" : "rgb(229 229 229)",
             border: "1px solid rgb(64 64 64)",
             width: { xs: "auto", md: "20%" },
             mt: 1,
@@ -78,6 +80,9 @@ export default function SettingsPanel({ open, onClose, anchor }) {
             fontFamily="Poppins"
             fontWeight="500"
             fontSize="14px"
+            sx={{
+              color: theme ? "rgb(255 255 255)" : "rgb(23 23 23 )" 
+            }}
           >Settings</Typography>
 
           <Typography
@@ -106,6 +111,7 @@ export default function SettingsPanel({ open, onClose, anchor }) {
             width: "100%",
             justifyContent: "space-between",
             mt: 1,
+            color: theme ? "rgb(255 255 255)" : "rgb(23 23 23 )"
           }}>
             <Typography fontFamily="Poppins" fontWeight="500" fontSize="14px" sx={{ width: "100%" }}>
               Labels
