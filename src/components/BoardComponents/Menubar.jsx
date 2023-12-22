@@ -1,5 +1,5 @@
 import { useContext, useState, useRef} from 'react'
-import { Box, Button, IconButton, Typography, Divider, useTheme } from '@mui/material'
+import { Box, Button, IconButton, Typography, Divider } from '@mui/material'
 import {
     SunIcon,
     MoonIcon,
@@ -11,13 +11,12 @@ import {
     Share1Icon,
     TableIcon
 } from "@radix-ui/react-icons";
-import { ThemeContext } from "../../App"
+import { ThemeContext } from "../../utils/useTheme"
 import SettingsPanel from './SettingsPanel';
 import ShareBoard from './ShareBoard';
 
 export default function Menubar({ id, data, setToggleListView }) {
-    const colorMode = useContext(ThemeContext)
-    const theme = useTheme()
+    const { theme, toggleTheme } = useContext(ThemeContext)
 
     const [anchorEl, setAnchorEl] = useState(null)
     const [openSetting, setOpenSetting] = useState(false)
@@ -40,7 +39,7 @@ export default function Menubar({ id, data, setToggleListView }) {
         <>
             <Box sx={{
                 m: 1,
-                border: "1px solid rgb(64 64 64)",
+                border: '1px solid #555',
                 borderRadius: '4px',
                 display: "flex",
                 flexDirection: "row",
@@ -58,6 +57,7 @@ export default function Menubar({ id, data, setToggleListView }) {
                             textAlign: 'center',
                             ml: 1,
                             mr: 1,
+                            color: theme === true ? 'rgb(255 255 255)' : 'rgb(23 23 23)'
                         }}>
                         {data.name}
                     </Typography>
@@ -112,9 +112,9 @@ export default function Menubar({ id, data, setToggleListView }) {
                         m: 1,
                         border: '1px solid  rgba(82, 82, 82, 1)'
                     }}
-                        onClick={colorMode.toggleTheme}
+                        onClick={toggleTheme}
                     >
-                        {theme.palette.currentTheme == "dark" ?
+                        {theme === false ?
                             <SunIcon style={{ width: "20px", height: "20px", color: 'rgba(163, 163, 163, 1)' }} /> :
                             <MoonIcon style={{ width: "20px", height: "20px", color: 'rgba(163, 163, 163, 1)' }} />
                         }

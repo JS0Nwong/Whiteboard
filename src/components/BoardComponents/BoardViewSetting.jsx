@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import {
   Box,
   Typography,
@@ -13,11 +13,13 @@ import {
   OutlinedInput,
   useTheme
 } from "@mui/material"
+import { ThemeContext } from '../../utils/useTheme';  
 const names = [
   'List',
   'Cards',
   'Roadmap'
 ];
+
 
 export default function BoardViewSetting() {
   const [personName, setPersonName] = React.useState([]);
@@ -31,7 +33,7 @@ export default function BoardViewSetting() {
       typeof value === 'string' ? value.split(',') : value,
     );
   };
-  const {palette} = useTheme()
+  const {theme} = useContext(ThemeContext)
 
   return (
     <Box sx={{
@@ -40,6 +42,7 @@ export default function BoardViewSetting() {
       width: "100%",
       justifyContent: "space-between",
       mt: 1,
+      color: theme ? "rgb(255 255 255)" : "rgb(23 23 23 )"
     }}>
       <Typography
         fontFamily="Poppins"
@@ -53,7 +56,7 @@ export default function BoardViewSetting() {
           MenuProps: {
             MenuListProps: {
               sx: {
-                backgroundColor: palette.currentTheme === "dark" ? "rgb(38 38 38)" :'rgb(245 245 245)',
+                backgroundColor: theme ? "rgb(38 38 38)" :'rgb(245 245 245)',
               }
             }
           }
@@ -80,7 +83,8 @@ export default function BoardViewSetting() {
             p: 0,
           },
           ".MuiListItemText-primary": {
-            pl: 1
+            pl: 1,
+            color: theme ? "rgb(255 255 255)" : "rgb(23 23 23 )"
           },
         }}
       >
@@ -90,7 +94,7 @@ export default function BoardViewSetting() {
             value={name}
             disableGutters
             sx={{
-              color: palette.currentTheme === "dark" ? "rgb(255 255 255)" :'rgb(23 23 23)',
+              color: theme ? "rgb(255 255 255)" :'rgb(23 23 23)',
               fontFamily: "Poppins",
               fontSize: "14px",
               fontWeight: '500',

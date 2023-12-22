@@ -1,15 +1,17 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Box, Input, InputAdornment, Button } from '@mui/material'
-import useDebounce from '../../utils/useDebounce'
-import useStore from '../../store'
 import SortIcon from '@mui/icons-material/Sort';
 import { useSearchParams } from 'react-router-dom'
 
 import useFilter from '../../utils/useFilter';
+import useDebounce from '../../utils/useDebounce'
+import { ThemeContext } from '../../utils/useTheme';
 
 export default function Searchbar({ data, setFilteredData }) {
 
     const {filterTasks, filterLabels, filterAll} = useFilter()
+
+    const {theme} = useContext(ThemeContext)
     
     const [searchParams, setSearchParams] = useSearchParams()
     // url searchparams setter
@@ -111,6 +113,7 @@ export default function Searchbar({ data, setFilteredData }) {
                             border: "1px solid #aaa"
                         }
                     },
+                    color: theme === true ? 'rgb(255 255 255)' : 'rgb(13 13 13)'
                 }}
                 autoComplete="off"
                 onChange={(e) => setSearch(e.target.value)}
@@ -121,13 +124,13 @@ export default function Searchbar({ data, setFilteredData }) {
                 sx={{
                     m: 0,
                     p: 0,
-                    backgroundColor: "rgba(68, 68, 68, 1)",
+                    backgroundColor: theme === true ? "rgba(38, 38, 38, 1)" : "rgba(68, 68, 68, 1)",
                     cursor: search.trim() !== ""  ? "pointer" : 'not-allowed',
                     "&:hover": {
                         backgroundColor: "rgba(68, 68, 68, 1)",
                     },
                     "&.Mui-disabled": {
-                        backgroundColor: "rgba(243, 243, 243, 0.2)",
+                        backgroundColor: theme === true ?  "rgba(243, 243, 243, 0.2)" : 'rgba(30, 41, 59, 0.2)',
                     },
                 }}
                 onClick={(e) => setSearch('')}

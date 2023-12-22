@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useContext } from 'react'
 import { useNavigate, useParams} from 'react-router-dom'
 
 import Board from './components/BoardComponents/Board'
@@ -20,10 +20,11 @@ import {
     getDoc
 } from "firebase/firestore";
 import { db } from "../src/firebase";
-import { getAuth } from "firebase/auth";
+import { ThemeContext } from './utils/useTheme'
 
 export default function BoardView() {
     const navigate = useNavigate()
+    const { theme } = useContext(ThemeContext)
 
     // Board State Data
     const [board, setBoard] = useState(null)
@@ -121,6 +122,10 @@ export default function BoardView() {
         }
     }, [board])
 
+    useEffect(() => {
+        console.log(theme)
+    }, [theme])
+
     // state and permissions checker, it makes sure the board doesnt load before the data is done loading 
     // and checks for user permissions to view and edit the board
     if (!board) return null
@@ -137,6 +142,7 @@ export default function BoardView() {
                 display: "flex",
                 flexDirection: 'column',
                 minWidth: "100%",
+                backgroundColor: theme === true ? 'rgb(23 23 23)' : 'rgb(229 229 229)'
             }}>
                 <Menubar
                     canShare={canEdit || owner || globalEdit}
