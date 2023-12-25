@@ -122,10 +122,6 @@ export default function BoardView() {
         }
     }, [board])
 
-    useEffect(() => {
-        console.log(theme)
-    }, [theme])
-
     // state and permissions checker, it makes sure the board doesnt load before the data is done loading 
     // and checks for user permissions to view and edit the board
     if (!board) return null
@@ -153,7 +149,7 @@ export default function BoardView() {
                 />
                 {toggleListView ?
                     <List
-                        data={listData}
+                        data={boardData}
                         orderBy={columnOrderBy}
                         id={id}
                         labels={labels}

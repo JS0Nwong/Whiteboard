@@ -1,7 +1,8 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useContext } from 'react'
 import { useNavigate } from "react-router-dom";
 import { Card, CardActionArea, CardContent, Box, Typography, IconButton } from '@mui/material'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { ThemeContext } from '../../utils/useTheme';
 
 import CardPopover from './CardPopover';
 
@@ -18,6 +19,7 @@ export default function BoardListCard({ data, id }) {
         setOpenPopover(!openPopover)
         setAnchorEl(anchor.current)
     }
+    const { theme } = useContext(ThemeContext)
 
     return (
         <>
@@ -40,7 +42,7 @@ export default function BoardListCard({ data, id }) {
                 onClick={() => navigate(`/boards/${data.id}`)}
             >
                 <CardContent sx={{
-                    color: "white",
+                    color: theme === true ? "white" : "rgb(38, 3, 38)",
                     display: "flex",
                     flexDirection: "column",
                     position: 'relative'
@@ -49,7 +51,8 @@ export default function BoardListCard({ data, id }) {
                         display: 'flex',
                         flexDirection: 'row',
                         justifyContent: "space-between",
-                        width: '100%'
+                        width: '100%',
+                        
                     }}>
                         <Typography
                             fontWeight="500"
@@ -58,7 +61,8 @@ export default function BoardListCard({ data, id }) {
                             sx={{
                                 textOverflow: "ellipsis",
                                 maxWidth: '100%',
-                                overflow: "hidden"
+                                overflow: "hidden",
+                                
                             }}
                         >{data.name}
                         </Typography>
@@ -76,7 +80,7 @@ export default function BoardListCard({ data, id }) {
                             <MoreVertIcon />
                         </IconButton>
                     </Box>
-                    
+
                     <Typography
                         variant='body2'
                         fontFamily="Poppins"
@@ -84,7 +88,7 @@ export default function BoardListCard({ data, id }) {
                             textOverflow: "ellipsis",
                             maxWidth: '100%',
                             overflow: "hidden",
-                            color: "rgba(255, 255, 255, 0.5)"
+                            color: theme === true ? "rgba(255, 255, 255, 0.5)" : "rgba(38, 38, 38, 0.65)"
                         }}
                     >{data.description}
                     </Typography>
@@ -92,14 +96,14 @@ export default function BoardListCard({ data, id }) {
                         variant='caption'
                         sx={{
                             mt: 2,
-                            color: "rgba(255, 255, 255, 0.3)"
+                            color: theme === true ? "rgba(255, 255, 255, 0.5)" : "rgba(38, 38, 38, 0.5)"
                         }}>
                         Last Modified: {data.createdAt.slice(0, 9)}
                     </Typography>
 
                 </CardContent>
             </Card>
-            {openPopover && <CardPopover 
+            {openPopover && <CardPopover
                 open={openPopover}
                 onClose={() => setOpenPopover(false)}
                 anchor={anchorEl}

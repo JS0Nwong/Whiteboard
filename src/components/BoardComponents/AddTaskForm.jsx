@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useContext, useState } from 'react'
 import {
   Dialog,
   DialogActions,
@@ -14,6 +14,7 @@ import {
   Stack
 } from '@mui/material'
 import { Cross1Icon, PlusCircledIcon } from '@radix-ui/react-icons'
+import { ThemeContext } from '../../utils/useTheme'
 
 export default function AddTaskForm({ 
   open, 
@@ -30,6 +31,7 @@ export default function AddTaskForm({
 }) {
   const [task, setTask] = useState('')
   const [addLabels, setAddLabels] = useState(labels)
+  const { theme } = useContext(ThemeContext)
 
   const handleSubmit = () => {
     if(mode === "edit") { 
@@ -68,14 +70,13 @@ export default function AddTaskForm({
         onClose={onClose}
         sx={{
           ".MuiDialog-paper": {
-            background: 'rgb(17 17 17)',
+            background: theme === true ? "rgb(17 17 17)" : "rgb(229 231 235)",
             border: "1px solid rgb(64 64 64)",
           }
         }}
       >
         <DialogContent>
           <DialogTitle sx={{
-            color: 'white',
             fontWeight: "500",
             fontSize: "1rem",
             fontFamily: "Poppins",
@@ -113,7 +114,7 @@ export default function AddTaskForm({
                 <FormControl required>
                   <FormLabel sx={{
                     "&.MuiFormLabel-root": {
-                      color: "white"
+                      color: theme === true ? "white" : "rgb(23 23 23)",
                     },
                     ".Mui-focused": {
                       color: "white"
@@ -148,7 +149,7 @@ export default function AddTaskForm({
                 <FormControl>
                   <FormLabel sx={{
                     "&.MuiFormLabel-root": {
-                      color: "white"
+                      color: theme === true ? "white" : "rgb(23 23 23)",
                     },
                     ".Mui-focused": {
                       color: "white"
@@ -196,6 +197,7 @@ export default function AddTaskForm({
                             "&:hover": {
                               backgroundColor: `rgba(${label.color.replace(/['"]+/g, '')}, 0.25)`,
                             },
+                            fontWeight:"500"
                           }}
                           onClick={() => handleAddLabel(label)}
                         />
@@ -207,7 +209,7 @@ export default function AddTaskForm({
                       size='small'
                       sx={{
                         fontSize: "12px",
-                        background: 'rgb(38 38 38)',
+                        background: theme === true ? 'rgb(38 38 38)' : 'rgb(155 155 155)',
                         width: "min-content",
                         position: "relative",
                         "&:hover": {

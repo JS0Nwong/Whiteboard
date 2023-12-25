@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import {
   Dialog,
   DialogActions,
@@ -13,6 +13,7 @@ import {
   FormLabel,
 } from '@mui/material'
 import { Cross1Icon } from '@radix-ui/react-icons'
+import { ThemeContext } from '../../utils/useTheme'
 
 const colors = [
   '52, 58, 64',
@@ -38,20 +39,21 @@ export default function AddColumnForm({
     onClose()
   }
 
+  const {theme} = useContext(ThemeContext)
+
   return (
     <Dialog
       open={open}
       onClose={onClose}
       sx={{
         ".MuiDialog-paper": {
-          background: 'rgb(17 17 17)',
+          background: theme === true ? "rgb(17 17 17)" : "rgb(229 231 235)",
           border: "1px solid rgb(64 64 64)",
           m: 1,
         }
       }}
     >
       <DialogTitle sx={{
-        color: 'white',
         fontWeight: "500",
         fontSize: "1rem",
         fontFamily: "Poppins"
@@ -112,12 +114,12 @@ export default function AddColumnForm({
         <form >
           <Box sx={{
             display: 'flex',
-            flexDirection: "column"
+            flexDirection: "column",
           }}>
             <FormControl required>
               <FormLabel sx={{
                 "&.MuiFormLabel-root": {
-                  color: "white",
+                  color: theme === true ? "white" : "rgb(23 23 23)",
                   fontFamily: "Poppins"
                 },
                 ".Mui-focused": {
@@ -157,7 +159,6 @@ export default function AddColumnForm({
                     }}
                     onClick={() => setColor(color)}
                   >
-                    
                   </IconButton>
                 ))}
               </Box>
@@ -167,7 +168,7 @@ export default function AddColumnForm({
             <FormControl required>
               <FormLabel sx={{
                 "&.MuiFormLabel-root": {
-                  color: "white",
+                  color: theme === true ? "white" : "rgb(23 23 23)",
                   fontFamily: "Poppins"
                 },
                 ".Mui-focused": {
@@ -182,7 +183,7 @@ export default function AddColumnForm({
                 placeholder={"Label"}
                 disableUnderline
                 sx={{
-                  color: "#FFFFFF",
+                  color: theme === true ? "white" : "rgb(23 23 23)",
                   pl: 1,
                   pr: 1,
                   pb: 0.5,

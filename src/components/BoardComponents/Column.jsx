@@ -119,7 +119,7 @@ export default function Column({
                                         sx={{
                                             ml: 1,
                                             color: theme === true ? "rgb(115 115 115)" : 'rgb(38 38 38)',
-                                            backgroundColor: theme === true ? "rgb(38 38 38)" : "rgb(156 163 175)",
+                                            backgroundColor: theme === true ? "rgb(38 38 38)" : "rgb(209 213 219)",
                                             borderRadius: "99px",
                                             width: "1.3rem",
                                             height: "1.3rem",

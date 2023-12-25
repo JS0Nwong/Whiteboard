@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import {
   Dialog,
   DialogActions,
@@ -11,9 +11,9 @@ import {
   Input,
   FormControl,
   FormLabel,
-  useTheme
 } from '@mui/material'
 import { Cross1Icon } from '@radix-ui/react-icons'
+import { ThemeContext } from '../../utils/useTheme'
 
 const colors = [
   '52, 58, 64',
@@ -36,7 +36,7 @@ export default function AddColumnForm({
   handleColumnUpdate,
   currentDescription
 }) {
-  const theme = useTheme()
+  const {theme} = useContext(ThemeContext)
   const [columnName, setColumnName] = useState(existingColumnName !== undefined ? existingColumnName :'')
   const [description, setDescription] = useState(currentDescription !== undefined ? currentDescription : '')
   const [currentColorFocus, setColor] = useState(currentColor !== undefined ? currentColor : '52, 58, 64')
@@ -59,7 +59,7 @@ export default function AddColumnForm({
       onClose={onClose}
       sx={{
         ".MuiDialog-paper": {
-          background: theme.palette.currentTheme === "dark" ? "rgb(17 17 17)":  "rgb(229 231 235)",
+          backgroundColor: theme === true ? "rgb(17 17 17)" : "rgb(229 231 235)",
           border: "1px solid rgb(64 64 64)",
           m: 1,
         }
@@ -154,7 +154,7 @@ export default function AddColumnForm({
                     borderRadius: "2px",
                     outline: 
                       currentColorFocus === color ? 
-                      `2px solid ${theme.palette.currentTheme === "dark" ? "rgb(255, 255, 255) ": "rgb(22, 22, 22)"}` : "none",
+                      `2px solid ${theme === true ? "rgb(255, 255, 255) ": "rgb(22, 22, 22)"}` : "none",
                     outlineOffset: "2px",
                     m: 0.5,
                     "&:hover": {
@@ -178,7 +178,7 @@ export default function AddColumnForm({
             <FormControl required>
               <FormLabel sx={{
                 "&.MuiFormLabel-root": {
-                  color: theme.palette.currentTheme === "dark" ? "white" : "rgb(23 23 23)",
+                  color: theme === true ? "white" : "rgb(23 23 23)",
                   fontFamily: "Poppins",
                   fontWeight: "500"
                 },
@@ -216,7 +216,7 @@ export default function AddColumnForm({
             <FormControl>
               <FormLabel sx={{
                 "&.MuiFormLabel-root": {
-                  color: theme.palette.currentTheme === "dark" ? "white" : "rgb(23 23 23)",
+                  color: theme === true ? "white" : "rgb(23 23 23)",
                   fontFamily: "Poppins",
                   fontWeight: "500"
                 },

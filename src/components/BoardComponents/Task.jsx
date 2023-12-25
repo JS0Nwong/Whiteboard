@@ -13,7 +13,6 @@ import useStore from '../../store'
 import { BoardContext } from "../../utils/useBoardSettings"
 import { ThemeContext } from '../../utils/useTheme'
 
-
 export default function Task({
     id,
     index,
@@ -188,13 +187,15 @@ export default function Task({
                             {taskView === "Detailed" ?
                                 <Typography
                                     fontFamily="Poppins"
-                                    fontWeight="500"
+                                    fontWeight="400"
                                     dangerouslySetInnerHTML={{
-                                        __html: sanitize
+                                        __html: sanitize !== "" ? sanitize : "No description provided"
                                     }}
                                     sx={{
                                         color: "rgba(163, 163, 163, 1)",
-                                        mt: 1
+                                        mt: 1,
+                                        fontSize: "14px",
+                                        fontStyle: sanitize !== "" ? "normal" : "italic"
                                     }}>
                                 </Typography>
                                 :
