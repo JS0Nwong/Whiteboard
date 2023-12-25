@@ -82,7 +82,6 @@ export default function Searchbar({ data, setFilteredData }) {
     //     search !== "" ? getFilters(search) : setFilteredData(null)
     // }, [data, search], 200)
     
-
     return (
         <Box sx={{
             m: 1,

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import {
     Dialog,
     DialogContent,
@@ -18,6 +18,7 @@ import {
 } from '@mui/material'
 import { Cross1Icon, ExternalLinkIcon } from '@radix-ui/react-icons'
 import useFirebaseHooks from '../../utils/firebaseHooks'
+import { ThemeContext } from '../../utils/useTheme'
 
 export default function ShareBoard({ id, data, open, onClose }) {
     const { 
@@ -25,9 +26,10 @@ export default function ShareBoard({ id, data, open, onClose }) {
         updateBoardViewPermissions, 
         updateUsers, 
         updateUserPermissionChange,
-        uid, 
         email 
     } = useFirebaseHooks()
+
+    const { theme } = useContext(ThemeContext)
 
     const [accessPermissions, setAccessPermissions] = useState('view')
     const [copySuccess, setCopySuccess] = useState(false)
@@ -69,26 +71,40 @@ export default function ShareBoard({ id, data, open, onClose }) {
                 onClose={onClose}
                 sx={{
                     ".MuiDialog-paper": {
-                        background: 'rgb(17 17 17)',
-                        border: "1px solid rgb(38 38 38)",
+                        background: theme === true ? 'rgb(17 17 17)' : 'rgb(229 229 229)',
+                        border: "1px solid rgb(64 64 64)",
                         m: 1,
                         width: { xs: "auto", sm:"45%", md: "25%" },
                     }
                 }}
             >
                 <DialogTitle sx={{
-                    color: 'white',
                     fontWeight: "500",
-                    fontSize: "1rem"
+                    fontSize: "1rem",
+                    color: theme === true ? 'rgb(255 255 255) ': 'rgb(23 23 23)'
                 }}>
                     Share Board
                 </DialogTitle>
+
+                <IconButton
+                    aria-label="close"
+                    onClick={onClose}
+                    sx={{
+                        position: 'absolute',
+                        right: 10,
+                        top: 10,
+                        color: (theme) => theme.palette.grey[500],
+                    }}
+                >
+                    <Cross1Icon />
+                </IconButton>
 
                 <DialogContent>
                     <Box sx={{
                         display: 'flex',
                         flexDirection: 'column',
-                        mt: 1
+                        mt: 1,
+                        color: theme === true ? 'rgb(255 255 255) ': 'rgb(23 23 23)'
                     }}>
                         <Typography fontWeight="500">People With Access</Typography>
                         <Box sx={{

@@ -1,67 +1,99 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { clsx } from "clsx"
 
 import { DataGrid } from '@mui/x-data-grid'
 import { Box, useTheme, createTheme } from '@mui/material'
 import Searchbar from './Searchbar'
+import { ThemeContext } from '../../utils/useTheme'
+import sanitizeHtml from "sanitize-html";
 
-export default function List({ data }) {
+export default function List({ data, orderBy }) {
 
-    const theme = useTheme()
-    const [filtered, setFiltered] = useState(structuredClone(data))
-    const styles = []
+    const { theme } = useContext(ThemeContext)
+    const [filtered, setFiltered] = useState(null)
+    const [dataRows, setDataRows] = useState(null)
 
-    const DataGridTheme = createTheme({
-        components: {
-            MuiDataGrid: {
-                styleOverrides: {
-                    root: {
-                        backgroundColor: 'red',
-                    },
-                    cell: {
-                        backgroundColor: "yellow"
-                    },
-                    columnHeader: {
-                        backgroundColor: "green"
-                    }
-                },
-            },
-        },
-    });
-
-    const createListStyles = () => {
-        data.map((task, index) => {
-            styles.push(`
-                ".MuiDataGrid-cellContent[title=${task.status}]": {
-                    border: '1px solid rgb(${task.associatedColor})'
-                }, 
-            `)
-        })
-        console.log(...styles)
+    const preprocessData = (order, rowData) => {
+        const rows = []
+        filtered !== null ?
+            order.map((key, index) => {
+                filtered[key].tasks.map((task, index) => {
+                    Object.assign(task, {
+                        ...task,
+                        status: key,
+                        associatedColor: filtered[key].columnColor
+                    })
+                    rows.push(task)
+                })
+            })
+            :
+            order.map((key, index) => {
+                rowData[key].tasks.map((task, index) => {
+                    Object.assign(task, {
+                        ...task,
+                        status: key,
+                        associatedColor: rowData[key].columnColor
+                    })
+                    rows.push(task)
+                })
+            })
+        setDataRows(rows)
     }
+
+    const rows = dataRows
 
     const columns = [
         { field: "task", headerName: "Title", minWidth: "400", headerClassName: "list-header" },
-        { field: "status", headerName: "Status", minWidth: 500, headerClassName: "list-header", },
-        { field: "description", headerName: "Description", minWidth: 420, flex: "1", headerClassName: "list-header" },
+        {
+            field: "status",
+            headerName: "Status",
+            renderCell: (params) => {
+                return (<span style={{
+                    border: `2px solid rgb(${params.row.associatedColor})`,
+                    borderRadius: "999px",
+                    padding: ".2rem 1rem .2rem 1rem",
+                }}>
+                    {params.value}
+                </span>)
+            },
+            minWidth: 500,
+            headerClassName: "list-header",
+        },
+        {
+            field: "description",
+            headerName: "Description",
+            renderCell: (params) => (
+                <span dangerouslySetInnerHTML={{
+                    __html: sanitizeHtml(params.value, {
+                        allowedTags: [
+                            "h1", "h2", "h3", "h4",
+                            "h5", "h6", "blockquote",
+                            "hr", "li", "ol", "p", "pre",
+                            "ul", "b", "code",
+                            "i", "mark", "q", "s", "span", "strong", "sub", "sup",
+                        ]
+                    })
+                }} />
+            ),
+            minWidth: 420, flex: "1",
+            headerClassName: "list-header"
+        },
     ]
 
-    const rows = filtered !== null ? filtered : data
-
     useEffect(() => {
-        createListStyles()
-    }, [])
-
+        preprocessData(orderBy, data)
+    }, [data, filtered])
 
     return (
         <>
             <Box>
                 <Searchbar
+                    data={data}
                     setFilteredData={setFiltered}
                 />
             </Box>
             <Box sx={{ height: "100%", width: '100%', p: 1 }}>
-                <DataGrid
+                {dataRows !== null ? <DataGrid
                     rows={rows}
                     columns={columns}
                     initialState={{
@@ -69,13 +101,13 @@ export default function List({ data }) {
                             paginationModel: { page: 0, pageSize: 100 },
                         },
                     }}
-                    sx={[{
+                    sx={{
                         border: "1px solid rgb(64 64 64)",
                         background:
-                            theme.palette.currentTheme === "dark" ? "rgb(20 20 20)" : "rgb(229 231 235)",
+                            theme === true ? "rgb(20 20 20)" : "rgb(229 231 235)",
                         '.list-header': {
                             backgroundColor:
-                                theme.palette.currentTheme === "dark" ? "rgb(30 30 30)" : "rgb(226 232 240)",
+                                theme === true ? "rgb(30 30 30)" : "rgb(209 213 219)",
                         },
                         "&.MuiDataGrid-columnHeadersInner": {
                             borderBottom: "1px solid rgb(82 82 82)",
@@ -99,13 +131,9 @@ export default function List({ data }) {
                         '&.MuiDataGrid-root .MuiDataGrid-columnHeader:focus, &.MuiDataGrid-root .MuiDataGrid-cell:focus': {
                             outline: 'none',
                         },
-                        // ".MuiDataGrid-cellContent[title='InProgress']": {
-                        //     border: '1px solid red',
-                        //     borderRadius: "999px",
-                        //     padding: ".2rem 1rem .2rem 1rem",
-                        // }
-                    }, {...Array.isArray(styles) ? styles : [styles]}]}
-                />
+                    }}
+                /> : <></>
+                }
             </Box>
         </>
     )
